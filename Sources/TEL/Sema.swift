@@ -98,7 +98,7 @@ public class Program {
     public internal(set) var layers: [Layer] = []
     public internal(set) var parameters: [Parameter] = []
     
-    let env = TypeEnvironment()
+    var env = TypeEnvironment()
 
     init(_ parse: ProgramTree) throws {
         var dataTypeDefined = false
@@ -143,21 +143,94 @@ public class Program {
                     guard maybeOutput == nil else {
                         throw SemanticError.outputRedeclared(variable)
                     }
-                    /// TODO: type-check expr
+
+                    switch expr {
+                    case .int(_):
+                        /// IDK what to do with these
+                        break
+                    case .float(_):
+                        /// IDK what to do with these
+                        break
+                    case let .variable(sourceVar):
+                        switch sourceVar {
+                        case let .simple(sourceName):
+                            switch variable {
+                            case let .simple(targetName):
+                                let source: TensorShape? = env[sourceName]
+                                if declType.shape.count == source?.rank {
+                                    env[targetName] = source
+                                } else {
+                                    throw SemanticError.typeMismatch
+                                }
+                            default:
+                                /// trying to assign a simple variable to a recurrent variable
+                                break
+                            }
+                        case let .recurrent(sourceName, timestep: sourceTimestep, offset: sourceOffset):
+                            let source: TensorShape? = env[sourceName]
+                            switch variable {
+                            case let .recurrent(targetName, timestep: targetTimestep, offset: targetOffset):
+                                //// not sure if this is right
+                                if sourceTimestep == targetTimestep,
+                                    sourceOffset  == targetOffset {
+                                    env[targetName] = source
+                                } else {
+                                    throw SemanticError.typeMismatch
+                                }
+                            default:
+                                /// trying to assign a recurrent variable to a simple variable
+                                break
+                            }
+                        }
+                        
+                    case let .add(left, right):
+                        switch (left, right) {
+                        case let (.variable(l), .variable(r)):
+                            //// result <- l + r
+                            //// match type of result with declType
+                            break
+                        default:
+                            throw SemanticError.typeMismatch
+                        }
+                        
+                    case let .mul(left, right):
+                        switch (left, right) {
+                        case let (.variable(l), .variable(r)):
+                            //// result <- l * r
+                            //// match type of result with declType
+                            break
+                        default:
+                            throw SemanticError.typeMismatch
+                        }
+                        
+                    case let .product(left, right):
+                        switch (left, right) {
+                        case let (.variable(l), .variable(r)):
+                            //// result <- l x r
+                            //// match type of result with declType
+                            break
+                        default:
+                            throw SemanticError.typeMismatch
+                        }
+                        
+                    case let .concat(exprs):
+                        break
+                    default:
+                        throw SemanticError.typeMismatch
+                    }
+
+
+                    ///try typeCheck(declaration: decl)
+
                     maybeOutput = Output(
                         name: variable.name,
                         shape: TensorShape(declType.shape)
                     )
 
-                case let .assignment(variable, declType, expr?):
-                    /// If declaration is input layer, expr is not needed
-                    if declType.role == .input {
-                        throw SemanticError.initializerUnexpected(variable)
-                    }
-                    /// TODO: type-check assignment block w/ init expr
-                    break
                 case let .recurrence(timestep, decls):
                     /// TODO: type-check recurrence block
+                    break
+                default:
                     break
                 }
             }
@@ -167,5 +240,87 @@ public class Program {
         guard let output = maybeOutput else { throw SemanticError.outputMissing }
         self.output = output
     }
-
+//
+//
+//    func typeCheck(declaration decl: Declaration) throws {
+//        switch decl {
+//        case let .assignment(variable, declType, expr?):
+//            switch expr {
+//            case .int(_):
+//                /// IDK what to do with these
+//                break
+//            case .float(_):
+//                /// IDK what to do with these
+//                break
+//            case let .variable(sourceVar):
+//                switch sourceVar {
+//                case let .simple(sourceName):
+//                    switch variable {
+//                    case let .simple(targetName):
+//                        let source: TensorShape? = env[sourceName]
+//                        if declType.shape.count == source?.rank {
+//                            env[targetName] = source
+//                        } else {
+//                            throw SemanticError.typeMismatch
+//                        }
+//                    default:
+//                        /// trying to assign a simple variable to a recurrent variable
+//                        break
+//                    }
+//                case let .recurrent(sourceName, timestep: sourceTimestep, offset: sourceOffset):
+//                    let source: TensorShape? = env[sourceName]
+//                    switch variable {
+//                    case let .recurrent(targetName, timestep: targetTimestep, offset: targetOffset):
+//                        //// not sure if this is right
+//                        if sourceTimestep == targetTimestep,
+//                            sourceOffset  == targetOffset {
+//                            env[targetName] = source
+//                        } else {
+//                            throw SemanticError.typeMismatch
+//                        }
+//                    default:
+//                        /// trying to assign a recurrent variable to a simple variable
+//                        break
+//                    }
+//                }
+//
+//            case let .add(left, right):
+//                switch (left, right) {
+//                case let (.variable(l), .variable(r)):
+//                    //// result <- l + r
+//                    //// match type of result with declType
+//                    break
+//                default:
+//                    throw SemanticError.typeMismatch
+//                }
+//                
+//            case let .mul(left, right):
+//                switch (left, right) {
+//                case let (.variable(l), .variable(r)):
+//                    //// result <- l * r
+//                    //// match type of result with declType
+//                    break
+//                default:
+//                    throw SemanticError.typeMismatch
+//                }
+//                
+//            case let .product(left, right):
+//                switch (left, right) {
+//                case let (.variable(l), .variable(r)):
+//                    //// result <- l x r
+//                    //// match type of result with declType
+//                    break
+//                default:
+//                    throw SemanticError.typeMismatch
+//                }
+//                
+//            case let .concat(exprs):
+//                break
+//            default:
+//                throw SemanticError.typeMismatch
+//            }
+//        default: break
+//            /// will not happen
+//        }
+//    }
 }
