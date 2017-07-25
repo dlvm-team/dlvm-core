@@ -75,14 +75,14 @@ public protocol AnalysisCacheable {
 }
 
 public extension IRCollection {
-    func analysis<Pass : AnalysisPass>(from pass: Pass.Type) throws -> Pass.Result
-        where Pass.Body == Self
+    func analysis<P : AnalysisPass>(from _: P.Type) throws -> P.Result
+        where P.Body == Self
     {
-        if let result = analysisManager.analysis(from: pass) {
+        if let result = analysisManager.analysis(from: P.self) {
             return result
         }
-        let result = try Pass.run(on: self)
-        analysisManager.updateAnalysis(result, from: pass)
+        let result = try P.run(on: self)
+        analysisManager.updateAnalysis(result, from: P.self)
         return result
     }
 }

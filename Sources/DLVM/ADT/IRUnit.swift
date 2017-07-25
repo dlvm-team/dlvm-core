@@ -33,16 +33,17 @@ public extension HashableByReference {
 }
 
 public protocol IRUnit : class, HashableByReference, Verifiable {
-    associatedtype Parent : IRCollection
+    associatedtype Parent : AnyObject // : IRCollection
     unowned var parent: Parent { get set }
+
+    /// Swift 4 sema workaround
+    var existsInParent: Bool { get }
+    var indexInParent: Int { get }
+    func removeFromParent()
 }
 
-public extension IRUnit
-    where Parent.Iterator.Element == Self, Parent.Index == Int, Parent.IndexDistance == Int,
-          Parent.Indices == Parent.Base.Indices, Parent.SubSequence == Parent.Base.SubSequence,
-          Parent.Element == Parent.Base.Iterator.Element, Parent.Element == Parent.Base.Element,
-          Parent.Element == Self, Parent.Index == Parent.Base.Index,
-          Parent.IndexDistance == Parent.Base.IndexDistance {
+/// Swift 4 sema workaround
+public extension BasicBlock {
     var indexInParent: Int {
         guard let index = parent.index(of: self) else {
             preconditionFailure("Self does not exist in parent basic block")
@@ -58,3 +59,58 @@ public extension IRUnit
         parent.remove(self)
     }
 }
+
+/// Swift 4 sema workaround
+public extension Instruction {
+    var indexInParent: Int {
+        guard let index = parent.index(of: self) else {
+            preconditionFailure("Self does not exist in parent basic block")
+        }
+        return index
+    }
+
+    var existsInParent: Bool {
+        return parent.contains(self)
+    }
+
+    func removeFromParent() {
+        parent.remove(self)
+    }
+}
+
+/// Swift 4 sema workaround
+public extension Function {
+    var indexInParent: Int {
+        guard let index = parent.index(of: self) else {
+            preconditionFailure("Self does not exist in parent basic block")
+        }
+        return index
+    }
+
+    var existsInParent: Bool {
+        return parent.contains(self)
+    }
+
+    func removeFromParent() {
+        parent.remove(self)
+    }
+}
+
+/*
+public extension IRUnit where Parent.Element == Self {
+    var indexInParent: Int {
+        guard let index = parent.index(of: self) else {
+            preconditionFailure("Self does not exist in parent basic block")
+        }
+        return index
+    }
+
+    var existsInParent: Bool {
+        return parent.contains(self)
+    }
+
+    func removeFromParent() {
+        parent.remove(self)
+    }
+}
+*/

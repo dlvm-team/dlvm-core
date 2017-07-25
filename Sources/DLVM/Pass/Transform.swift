@@ -22,12 +22,11 @@ public extension IRCollection {
     ///
     /// - Returns: whether changes are made
     @discardableResult
-    func applyTransform<Transform : TransformPass>(_ transform: Transform.Type) throws -> Bool
-        where Transform.Body == Self
-    {
+    func applyTransform<P : TransformPass>(_: P.Type) throws -> Bool
+        where P.Body == Self {
         guard canApplyTransforms else { return false }
-        let changed = try transform.run(on: self)
-        if transform.shouldInvalidateAnalyses, changed {
+        let changed = try P.run(on: self)
+        if P.shouldInvalidateAnalyses, changed {
             invalidateAnalyses()
         }
         /// Run verifier
@@ -38,8 +37,9 @@ public extension IRCollection {
 
 public extension IRCollection {
     @discardableResult
-    func mapTransform<Transform : TransformPass>(_ transform: Transform.Type) throws -> Bool
-        where Transform.Body == Iterator.Element
+    func mapTransform<Transform : TransformPass>(
+        _ transform: Transform.Type) throws -> Bool
+        where Transform.Body == Element
     {
         var changed = false
         for element in self {

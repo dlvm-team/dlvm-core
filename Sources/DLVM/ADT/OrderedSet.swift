@@ -20,7 +20,6 @@
 import Foundation
 
 public protocol OrderedSetCollection : RangeReplaceableCollection, RandomAccessCollection {
-    associatedtype Element : Hashable = Iterator.Element
     mutating func remove(_ element: Element)
     mutating func insert(_ element: Element, after other: Element)
     mutating func insert(_ element: Element, before other: Element)

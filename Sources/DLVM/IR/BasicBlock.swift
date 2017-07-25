@@ -34,7 +34,7 @@ public class Argument : Value, Named, HashableByReference {
 }
 
 public final class BasicBlock : IRCollection, IRUnit, Named {
-
+    public typealias Base = OrderedSet<Instruction>
     public typealias Element = Instruction
 
     /// Name of the basic block
@@ -70,6 +70,75 @@ public final class BasicBlock : IRCollection, IRUnit, Named {
         return true
     }
 
+}
+
+public extension BasicBlock {
+    func makeIterator() -> Base.Iterator {
+        return elements.makeIterator()
+    }
+
+    func index(after i: Base.Index) -> Base.Index {
+        return elements.index(after: i)
+    }
+
+    func index(before i: Base.Index) -> Base.Index {
+        return elements.index(before: i)
+    }
+
+    var indices: Base.Indices {
+        return elements.indices
+    }
+
+    var startIndex: Base.Index {
+        return elements.startIndex
+    }
+
+    var endIndex: Base.Index {
+        return elements.endIndex
+    }
+
+    subscript(i: Base.Index) -> Base.Element {
+        return elements[i]
+    }
+
+    subscript(bounds: Range<Base.Index>) -> Base.SubSequence {
+        return elements[bounds]
+    }
+}
+
+public extension BasicBlock {
+    func remove(_ element: Element) {
+        elements.remove(element)
+        invalidateAnalyses()
+    }
+
+    func contains(_ element: Element) -> Bool {
+        return elements.contains(element)
+    }
+
+    func append(_ newElement: Element) {
+        elements.append(newElement)
+        newElement.parent = self
+        invalidateAnalyses()
+    }
+
+    func insert(_ newElement: Element, at index: Base.Index) {
+        elements.insert(newElement, at: index)
+        newElement.parent = self
+        invalidateAnalyses()
+    }
+
+    func insert(_ newElement: Element, after other: Element) {
+        elements.insert(newElement, after: other)
+        newElement.parent = self
+        invalidateAnalyses()
+    }
+
+    func insert(_ newElement: Element, before other: Element) {
+        elements.insert(newElement, before: other)
+        newElement.parent = self
+        invalidateAnalyses()
+    }
 }
 
 // MARK: - Predicates and accessors

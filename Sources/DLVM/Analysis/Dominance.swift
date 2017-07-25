@@ -88,10 +88,9 @@ public extension DominatorTree {
 
 }
 
-// MARK: - IRSubUnit dominance in IRCollection
-// SILGen crasher: public extension DominatorTree where Node : IRCollection, Node.Element : IRSubUnit {
 public extension DominatorTree where Node == BasicBlock {
-    func properlyDominates(_ instruction: Instruction, _ otherInstruction: Instruction) -> Bool {
+    func properlyDominates(_ instruction: Instruction,
+                           _ otherInstruction: Instruction) -> Bool {
         let bb1 = instruction.parent, bb2 = otherInstruction.parent
         if bb1 !== bb2 {
             return properlyDominates(bb1, bb2)
@@ -114,7 +113,6 @@ public extension DominatorTree where Node == BasicBlock {
     }
 }
 
-// MARK: - IRUnit dominance
 public extension IRUnit {
     public func dominates(_ other: Self,
                           in domTree: DominatorTree<Self>) -> Bool {

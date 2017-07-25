@@ -18,24 +18,23 @@
 //
 
 /// IRCollection
-public protocol IRCollection : class, RandomAccessCollection, Verifiable, AnalysisCacheable {
+public protocol IRCollection : class, RandomAccessCollection, Verifiable, AnalysisCacheable where Index == Int
+{
     associatedtype Base : OrderedSetCollection
-    associatedtype Element : Hashable = Base.Element
-    associatedtype Index = Base.Index
-    associatedtype IndexDistance = Base.IndexDistance
-    associatedtype Iterator = Base.Iterator
-    associatedtype Indices = Base.Indices
-    associatedtype SubSequence : Collection = Base.SubSequence
+        where Base.Element == Element
     var elements: Base { get set }
     var canApplyTransforms: Bool { get }
+    func remove(_ element: Element)
+    func contains(_ element: Element) -> Bool
+    func insert(_ newElement: Element, after other: Element)
+    func insert(_ newElement: Element, before other: Element)
 }
 
+/*
 public extension IRCollection
-    where Base.Index == Index, Base.Iterator == Iterator, Base.Iterator.Element == Element,
-          Base.Element == Element, Base.SubSequence == SubSequence, Base.Indices == Indices,
-          Base.IndexDistance == IndexDistance {
+    where Base : OrderedSetCollection {
 
-    func makeIterator() -> Iterator {
+    func makeIterator() -> Base.Iterator {
         return elements.makeIterator()
     }
 
@@ -68,10 +67,7 @@ public extension IRCollection
     }
 }
 
-public extension IRCollection
-    where Base.Index == Index, Base.Element == Base.Iterator.Element, Base.Element == Element,
-          Base.SubSequence == SubSequence, Base.Indices == Indices, Base.IndexDistance == IndexDistance,
-          Element : IRUnit, Element.Parent == Self {
+public extension IRCollection where Element.Parent == Self {
 
     func remove(_ element: Element) {
         elements.remove(element)
@@ -107,3 +103,4 @@ public extension IRCollection
     }
 
 }
+*/

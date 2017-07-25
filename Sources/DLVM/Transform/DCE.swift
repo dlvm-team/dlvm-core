@@ -55,7 +55,8 @@ open class DeadCodeElimination : TransformPass {
             sideEffectInfo[inst] == .none,
             !inst.kind.isTerminator else { return false }
         /// Eliminate
-        inst.removeFromParent()
+//        inst.removeFromParent()
+        inst.parent.remove(inst)
         count += 1
         /// Remove instruction and check users
         /// Get new user analysis
