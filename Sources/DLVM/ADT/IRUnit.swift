@@ -33,17 +33,11 @@ public extension HashableByReference {
 }
 
 public protocol IRUnit : class, HashableByReference, Verifiable {
-    associatedtype Parent : AnyObject // : IRCollection
+    associatedtype Parent : IRCollection where Parent.Element == Self
     unowned var parent: Parent { get set }
-
-    /// Swift 4 sema workaround
-    var existsInParent: Bool { get }
-    var indexInParent: Int { get }
-    func removeFromParent()
 }
 
-/// Swift 4 sema workaround
-public extension BasicBlock {
+public extension IRUnit {
     var indexInParent: Int {
         guard let index = parent.index(of: self) else {
             preconditionFailure("Self does not exist in parent basic block")
@@ -59,58 +53,3 @@ public extension BasicBlock {
         parent.remove(self)
     }
 }
-
-/// Swift 4 sema workaround
-public extension Instruction {
-    var indexInParent: Int {
-        guard let index = parent.index(of: self) else {
-            preconditionFailure("Self does not exist in parent basic block")
-        }
-        return index
-    }
-
-    var existsInParent: Bool {
-        return parent.contains(self)
-    }
-
-    func removeFromParent() {
-        parent.remove(self)
-    }
-}
-
-/// Swift 4 sema workaround
-public extension Function {
-    var indexInParent: Int {
-        guard let index = parent.index(of: self) else {
-            preconditionFailure("Self does not exist in parent basic block")
-        }
-        return index
-    }
-
-    var existsInParent: Bool {
-        return parent.contains(self)
-    }
-
-    func removeFromParent() {
-        parent.remove(self)
-    }
-}
-
-/*
-public extension IRUnit where Parent.Element == Self {
-    var indexInParent: Int {
-        guard let index = parent.index(of: self) else {
-            preconditionFailure("Self does not exist in parent basic block")
-        }
-        return index
-    }
-
-    var existsInParent: Bool {
-        return parent.contains(self)
-    }
-
-    func removeFromParent() {
-        parent.remove(self)
-    }
-}
-*/

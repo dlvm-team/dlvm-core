@@ -67,40 +67,7 @@ public final class Function : Named, IRCollection, IRUnit {
     }
 }
 
-public extension Function {
-    func makeIterator() -> Base.Iterator {
-        return elements.makeIterator()
-    }
-
-    func index(after i: Base.Index) -> Base.Index {
-        return elements.index(after: i)
-    }
-
-    func index(before i: Base.Index) -> Base.Index {
-        return elements.index(before: i)
-    }
-
-    var indices: Base.Indices {
-        return elements.indices
-    }
-
-    var startIndex: Base.Index {
-        return elements.startIndex
-    }
-
-    var endIndex: Base.Index {
-        return elements.endIndex
-    }
-
-    subscript(i: Base.Index) -> Base.Element {
-        return elements[i]
-    }
-
-    subscript(bounds: Range<Base.Index>) -> Base.SubSequence {
-        return elements[bounds]
-    }
-}
-
+/// - Note: This is a workaround for a type checker bug in Swift 4
 public extension Function {
     func remove(_ element: Element) {
         elements.remove(element)
