@@ -19,11 +19,16 @@
 
 /// Algebra Simplification simplifies the following expressions
 /// 1. Arithmetics
+/// 1.1 Neutral/absorbing expressions
 ///    - x + 0 | 0 + x | x - 0 | x * 1 | 1 * x | x / 1 => x
 ///    - x * 0 | 0 * x => 0
-///    - x^(-1) => 1 / x
 ///    - x^0 => 1
 ///    - x^1 => x
+/// 1.2 Same argument reduction
+///    - x - x | x % x => 0
+///    - x / x => 1
+/// 1.3 Strength reduction
+///    - x^(-1) => 1 / x
 ///    - x^2 => x * x
 /// 2. Trignometry
 ///    - (e^x - e^(-x)) / 2 => sinh(x)
@@ -51,6 +56,7 @@ open class AlgebraSimplification : TransformPass {
         /// Pattern-match expressions
         switch expr {
         // MARK: - 1. Arithmetics
+        // MARK: - 1.1 Neutral/absorbing expressions
         /// - x + 0 | 0 + x | x - 0 | x * 1 | 1 * x => x
         case let .numericBinary(.add, x, 0, inst),
              let .numericBinary(.add, 0, x, inst),
@@ -64,16 +70,9 @@ open class AlgebraSimplification : TransformPass {
         /// - x * 0 | 0 * x => 0
         case let .numericBinary(.multiply, x, 0, inst),
              let .numericBinary(.multiply, 0, x, inst):
-            function.replaceAllUses(of: inst, with: %x.makeLiteral(0))
+            let newVal = expr.makeLiteral(0)
+            function.replaceAllUses(of: inst, with: %newVal)
             expr.removeIntermediates(upTo: x)
-        /// - x^(-1) => 1 / x
-        case let .numericBinary(.power, x, -1, inst):
-            builder.move(after: inst)
-            let one = x.makeScalar(1)
-            let div = builder.divide(%one, %x)
-            function.replaceAllUses(of: inst, with: %div)
-            expr.removeIntermediates(upTo: x)
-            workList.append(.numericBinary(.multiply, .atom(%one), x, div))
         /// - x^0 => 1
         case let .numericBinary(.power, x, 0, inst):
             let newVal = expr.makeLiteral(1)
@@ -84,6 +83,29 @@ open class AlgebraSimplification : TransformPass {
             function.replaceAllUses(of: inst, with: %x)
             expr.removeIntermediates(upTo: x)
             workList.append(x)
+
+        // MARK: - 1.2 Same argument reduction
+        /// - x - x | x % x => 0
+        case let .numericBinary(.subtract, x, y, inst) where x == y,
+             let .numericBinary(.modulo, x, y, inst) where x == y:
+            let newVal = expr.makeLiteral(0)
+            function.replaceAllUses(of: inst, with: %newVal)
+            expr.removeIntermediates(upTo: x)
+        /// - x / x => 1
+        case let .numericBinary(.divide, x, y, inst) where x == y:
+            let newVal = expr.makeLiteral(1)
+            function.replaceAllUses(of: inst, with: %newVal)
+            expr.removeIntermediates(upTo: x)
+
+        // MARK: - 1.3 Strength reduction
+        /// - x^(-1) => 1 / x
+        case let .numericBinary(.power, x, -1, inst):
+            builder.move(after: inst)
+            let one = x.makeScalar(1)
+            let div = builder.divide(%one, %x)
+            function.replaceAllUses(of: inst, with: %div)
+            expr.removeIntermediates(upTo: x)
+            workList.append(.numericBinary(.multiply, .atom(%one), x, div))
         /// - x^2 => x * x
         case let .numericBinary(.power, x, 2, inst):
             builder.move(after: inst)
