@@ -25,7 +25,7 @@
 ///    - x^0 => 1
 ///    - x^1 => x
 /// 1.2 Same argument reduction
-///    - x - x | x % x => 0
+///    - x - x => 0
 ///    - x / x => 1
 /// 1.3 Strength reduction
 ///    - x^(-1) => 1 / x
@@ -85,7 +85,7 @@ open class AlgebraSimplification : TransformPass {
             workList.append(x)
 
         // MARK: - 1.2 Same argument reduction
-        /// - x - x | x % x => 0
+        /// - x - x => 0
         case let .numericBinary(.subtract, x, y, inst) where x == y,
              let .numericBinary(.modulo, x, y, inst) where x == y:
             let newVal = expr.makeLiteral(0)
