@@ -78,9 +78,9 @@ class TransformTests: XCTestCase {
 
     func testAlgebraSimplification() {
         let fun = builder.buildFunction(named: "foo",
-                                        argumentTypes: [.scalar(.int(32)), .scalar(.int(32))],
+                                        argumentTypes: [.scalar(.int(32))],
                                         returnType: .int(32))
-        let entry = builder.buildEntry(argumentNames: ["x", "y"], in: fun)
+        let entry = builder.buildEntry(argumentNames: ["x"], in: fun)
         builder.move(to: entry)
         
         /// Arithmetics
@@ -113,14 +113,11 @@ class TransformTests: XCTestCase {
         builder.return(%d3)
 
         let module = builder.module
-        var changed = true
-        while (changed) {
-            changed = module.mapTransform(AlgebraSimplification.self)
-        }
+        module.mapTransform(AlgebraSimplification.self)
 
         let after = """
-            func @foo: (i32, i32) -> i32 {
-            'entry(%x: i32, %y: i32):
+            func @foo: (i32) -> i32 {
+            'entry(%x: i32):
                 return %x: i32
             }
             """
