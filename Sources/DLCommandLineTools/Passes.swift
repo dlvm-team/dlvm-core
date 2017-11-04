@@ -21,29 +21,30 @@ import DLVM
 
 public func runPass(named name: String, on module: Module,
                     bypassingVerification noVerify: Bool = false) throws {
+    var changed: Bool
     switch name {
     case "AD", "Differentiation":
-        module.applyTransform(Differentiation.self, bypassingVerification: noVerify)
+        changed = module.applyTransform(Differentiation.self, bypassingVerification: noVerify)
     case "CP", "Checkpointing":
-        module.mapTransform(Checkpointing.self, bypassingVerification: noVerify)
+        changed = module.mapTransform(Checkpointing.self, bypassingVerification: noVerify)
     case "DCE", "DeadCodeElimination":
-        module.mapTransform(DeadCodeElimination.self, bypassingVerification: noVerify)
+        changed = module.mapTransform(DeadCodeElimination.self, bypassingVerification: noVerify)
     case "CSE", "CommonSubexpressionElimination":
-        module.mapTransform(CommonSubexpressionElimination.self, bypassingVerification: noVerify)
+        changed = module.mapTransform(CommonSubexpressionElimination.self, bypassingVerification: noVerify)
     case "AS", "AlgebraSimplification":
-        module.forEach { fn in fn.applyTransform(AlgebraSimplification.self, bypassingVerification: noVerify) }
+        changed = module.mapTransform(AlgebraSimplification.self, bypassingVerification: noVerify)
     case "LAF", "LinearAlgebraFusion":
-        module.forEach { fn in fn.applyTransform(LinearAlgebraFusion.self, bypassingVerification: noVerify) }
+        changed = module.mapTransform(LinearAlgebraFusion.self, bypassingVerification: noVerify)
     case "SP", "StackPromotion":
-        module.mapTransform(StackPromotion.self, bypassingVerification: noVerify)
+        changed = module.mapTransform(StackPromotion.self, bypassingVerification: noVerify)
     case "VP", "ValuePromotion":
-        module.mapTransform(ValuePromotion.self, bypassingVerification: noVerify)
+        changed = module.mapTransform(ValuePromotion.self, bypassingVerification: noVerify)
     case "MCO", "MatrixChainOrdering":
-        module.forEach { fn in fn.mapTransform(MatrixChainOrdering.self, bypassingVerification: noVerify) }
+        changed = module.mapTransform(MatrixChainOrdering.self, bypassingVerification: noVerify)
     case "LBP", "LiteralBroadcastingPromotion":
-        module.forEach { fn in fn.mapTransform(LiteralBroadcastingPromotion.self, bypassingVerification: noVerify) }
+        changed = module.mapTransform(LiteralBroadcastingPromotion.self, bypassingVerification: noVerify)
     default:
         error("No transform pass named \(name)")
     }
+    print("\(name):", changed ? "changed" : "unchanged")
 }
-
