@@ -20,7 +20,7 @@ func @foo: () -> <1 x 10 x f32> {
 'entry():
     %0.0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
     %dead0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
-    %dead1 = add 1: f32, %dead0 : <1 x 10 x f32>
+    %dead1 = add 1: f32, %dead0: <1 x 10 x f32>
     return %0.0: <1 x 10 x f32>
 }
 
@@ -30,7 +30,7 @@ func @foo2: () -> <1 x 10 x f32> {
 'entry():
     %0.0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
     %dead0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
-    %dead1 = add 1: f32, %dead0 : <1 x 10 x f32>
+    %dead1 = add 1: f32, %dead0: <1 x 10 x f32>
     return %0.0: <1 x 10 x f32>
 }
 
@@ -39,7 +39,7 @@ func @foo3: () -> <1 x 10 x f32> {
 'entry():
     %0.0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
     %dead0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
-    %dead1 = add 1: f32, %dead0 : <1 x 10 x f32>
+    %dead1 = add 1: f32, %dead0: <1 x 10 x f32>
     return %0.0: <1 x 10 x f32>
 }
 
@@ -48,7 +48,7 @@ func @foo4: () -> <1 x 10 x f32> {
 'entry():
     %0.0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
     %dead0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
-    %dead1 = add 1: f32, %dead0 : <1 x 10 x f32>
+    %dead1 = add 1: f32, %dead0: <1 x 10 x f32>
     return %0.0: <1 x 10 x f32>
 }
 
@@ -57,7 +57,7 @@ func @foo5: () -> <1 x 10 x f32> {
 'entry():
     %0.0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
     %dead0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
-    %dead1 = add 1: f32, %dead0 : <1 x 10 x f32>
+    %dead1 = add 1: f32, %dead0: <1 x 10 x f32>
     return %0.0: <1 x 10 x f32>
 }
 
@@ -66,7 +66,7 @@ func @foo6: () -> <1 x 10 x f32> {
 'entry():
     %0.0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
     %dead0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
-    %dead1 = add 1: f32, %dead0 : <1 x 10 x f32>
+    %dead1 = add 1: f32, %dead0: <1 x 10 x f32>
     return %0.0: <1 x 10 x f32>
 }
 
@@ -75,7 +75,7 @@ func @foo7: () -> <1 x 10 x f32> {
 'entry():
     %0.0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
     %dead0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
-    %dead1 = add 1: f32, %dead0 : <1 x 10 x f32>
+    %dead1 = add 1: f32, %dead0: <1 x 10 x f32>
     return %0.0: <1 x 10 x f32>
 }
 
@@ -84,7 +84,7 @@ func @foo8: () -> <1 x 10 x f32> {
 'entry():
     %0.0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
     %dead0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
-    %dead1 = add 1: f32, %dead0 : <1 x 10 x f32>
+    %dead1 = add 1: f32, %dead0: <1 x 10 x f32>
     return %0.0: <1 x 10 x f32>
 }
 
