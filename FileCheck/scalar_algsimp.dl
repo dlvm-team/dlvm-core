@@ -1,5 +1,7 @@
 // RUN: dlopt -f %s -p AS --print-ir | FileCheck %s
 
+// CHECK: AS: changed
+
 module "mnist"
 stage raw
 

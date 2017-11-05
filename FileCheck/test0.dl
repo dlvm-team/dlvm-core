@@ -1,5 +1,7 @@
 // RUN: dlopt -f %s -p DCE --print-ir | FileCheck %s
 
+// CHECK: DCE: changed
+
 module "mnist"
 stage raw
 
