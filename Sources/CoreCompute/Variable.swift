@@ -28,3 +28,9 @@ public class Variable {
         self.type = type
     }
 }
+
+extension Variable : Equatable {
+    public static func == (lhs: Variable, rhs: Variable) -> Bool {
+        return lhs === rhs
+    }
+}

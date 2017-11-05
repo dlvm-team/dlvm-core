@@ -19,12 +19,12 @@
 
 import CoreOp
 
-public enum DataType {
+public enum DataType : Equatable {
     case int(Int)
     case float(Int)
 }
 
-public struct Type {
+public struct Type : Equatable {
     public var size: Int
     public var dataType: DataType
 }

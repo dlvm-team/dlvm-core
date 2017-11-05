@@ -19,7 +19,7 @@
 
 import CoreOp
 
-public indirect enum Expression {
+public indirect enum Expression : Equatable {
     case symbol(String)
     case unary(NumericUnaryOp)
     case numericBinary(NumericBinaryOp)
