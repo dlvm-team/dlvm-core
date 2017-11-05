@@ -1,3 +1,5 @@
+// RUN: dlopt -f %s --print-ir | FileCheck %s
+
 module "mnist"
 stage raw
 
@@ -14,3 +16,10 @@ func @inference: (f32, f32, f32) -> f32 {
     %0.1 = add %0.0: f32, %b: f32
     return %0.1: f32
 }
+
+// CHECK: func @inference: (f32, f32, f32) -> f32 {
+// CHECK-NEXT: 'entry(%x: f32, %w: f32, %b: f32):
+// CHECK-NEXT:     %0.0 = multiply %x: f32, %w: f32
+// CHECK-NEXT:     %0.1 = add %0.0: f32, %b: f32
+// CHECK-NEXT:     return %0.1: f32
+// CHECK-NEXT: }

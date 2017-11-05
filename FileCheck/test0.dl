@@ -1,3 +1,5 @@
+// RUN: dlopt -f %s -p DCE --print-ir | FileCheck %s
+
 module "mnist"
 stage raw
 
@@ -24,69 +26,11 @@ func @foo: () -> <1 x 10 x f32> {
     return %0.0: <1 x 10 x f32>
 }
 
-
-!inline
-func @foo2: () -> <1 x 10 x f32> {
-'entry():
-    %0.0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
-    %dead0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
-    %dead1 = add 1: f32, %dead0: <1 x 10 x f32>
-    return %0.0: <1 x 10 x f32>
-}
-
-!inline
-func @foo3: () -> <1 x 10 x f32> {
-'entry():
-    %0.0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
-    %dead0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
-    %dead1 = add 1: f32, %dead0: <1 x 10 x f32>
-    return %0.0: <1 x 10 x f32>
-}
-
-!inline
-func @foo4: () -> <1 x 10 x f32> {
-'entry():
-    %0.0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
-    %dead0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
-    %dead1 = add 1: f32, %dead0: <1 x 10 x f32>
-    return %0.0: <1 x 10 x f32>
-}
-
-!inline
-func @foo5: () -> <1 x 10 x f32> {
-'entry():
-    %0.0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
-    %dead0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
-    %dead1 = add 1: f32, %dead0: <1 x 10 x f32>
-    return %0.0: <1 x 10 x f32>
-}
-
-!inline
-func @foo6: () -> <1 x 10 x f32> {
-'entry():
-    %0.0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
-    %dead0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
-    %dead1 = add 1: f32, %dead0: <1 x 10 x f32>
-    return %0.0: <1 x 10 x f32>
-}
-
-!inline
-func @foo7: () -> <1 x 10 x f32> {
-'entry():
-    %0.0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
-    %dead0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
-    %dead1 = add 1: f32, %dead0: <1 x 10 x f32>
-    return %0.0: <1 x 10 x f32>
-}
-
-!inline
-func @foo8: () -> <1 x 10 x f32> {
-'entry():
-    %0.0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
-    %dead0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
-    %dead1 = add 1: f32, %dead0: <1 x 10 x f32>
-    return %0.0: <1 x 10 x f32>
-}
+// CHECK: func @foo: () -> <1 x 10 x f32> {
+// CHECK-NEXT: 'entry():
+// CHECK-NEXT:     %0.0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
+// CHECK-NEXT:     return %0.0: <1 x 10 x f32>
+// CHECK-NEXT: }
 
 func @foo9: () -> <2 x 2 x f32> {
 'entry():
