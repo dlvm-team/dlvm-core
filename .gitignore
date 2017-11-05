@@ -71,3 +71,6 @@ xcuserdata/
 Documentation/**/auto/
 *.pdf
 *.resolved
+
+# FileCheck
+FileCheck/Output
