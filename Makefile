@@ -11,6 +11,9 @@ release:
 test:
 	swift test $(SFLAGS)
 
+check: all
+	lit FileCheck
+
 update:
 	swift package update
 
