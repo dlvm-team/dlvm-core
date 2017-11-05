@@ -72,7 +72,7 @@ public extension IRCollection where Element : IRUnit {
 
     func remove(_ element: Element) {
         elements.remove(element)
-        invalidateAnalyses()
+        invalidatePassResults()
     }
 
     func contains(_ element: Element) -> Bool {
@@ -85,25 +85,25 @@ public extension IRCollection where Element : IRUnit, Element.Parent == Self {
     func append(_ newElement: Element) {
         elements.append(newElement)
         newElement.parent = self
-        invalidateAnalyses()
+        invalidatePassResults()
     }
 
     func insert(_ newElement: Element, at index: Base.Index) {
         elements.insert(newElement, at: index)
         newElement.parent = self
-        invalidateAnalyses()
+        invalidatePassResults()
     }
 
     func insert(_ newElement: Element, after other: Element) {
         elements.insert(newElement, after: other)
         newElement.parent = self
-        invalidateAnalyses()
+        invalidatePassResults()
     }
 
     func insert(_ newElement: Element, before other: Element) {
         elements.insert(newElement, before: other)
         newElement.parent = self
-        invalidateAnalyses()
+        invalidatePassResults()
     }
 
 }
