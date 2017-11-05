@@ -29,10 +29,10 @@ func @foo: () -> <1 x 10 x f32> {
 }
 
 // CHECK: func @foo: () -> <1 x 10 x f32> {
-// CHECK:     %0.0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
-// CHECK-NEXT:     return %0.0: <1 x 10 x f32>
+// CHECK: %0.0 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
+// CHECK-NEXT: return %0.0: <1 x 10 x f32>
 
-func @foo9: () -> <2 x 2 x f32> {
+func @foo2: () -> <2 x 2 x f32> {
 'entry():
     %a = random scalar from 0.0: f32 upto 1.0: f32
     %b = random 4 from 0.0: f32 upto 1.0: f32

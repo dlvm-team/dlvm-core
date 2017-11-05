@@ -15,8 +15,8 @@ func @inference: (f32, f32, f32) -> f32 {
 }
 
 // CHECK-LABEL: func @inference
-// CHECK:     %0.0 = cos 1: f32
-// CHECK-NEXT:     return %0.0: f32
+// CHECK: %0.0 = cos 1: f32
+// CHECK-NEXT: return %0.0: f32
 
 func @bar: (f32, f32, f32) -> f32 {
 'entry(%x: f32, %w: f32, %b: f32):
@@ -35,11 +35,11 @@ func @bar: (f32, f32, f32) -> f32 {
 }
 
 // CHECK-LABEL: func @bar
-// CHECK:     %0.0 = cos 1: f32
+// CHECK: %0.0 = cos 1: f32
 // CHECK: 'bb0():
-// CHECK-NEXT:     %lit = literal <1: f32, 1: f32>: <2 x f32>
-// CHECK-NEXT:     %1.1 = extract 0 from 1: <2 x f32>
-// CHECK-NEXT:     return %1.1: f32
+// CHECK-NEXT: %lit = literal <1: f32, 1: f32>: <2 x f32>
+// CHECK-NEXT: %1.1 = extract 0 from 1: <2 x f32>
+// CHECK-NEXT: return %1.1: f32
 
 func @assoc1: (<2 x 3 x f32>, <2 x 3 x f32>, <2 x 3 x f32>, <2 x 3 x f32>) -> <2 x 3 x f32> {
 'entry(%x: <2 x 3 x f32>, %y: <2 x 3 x f32>, %z: <2 x 3 x f32>, %a: <2 x 3 x f32>):
@@ -50,10 +50,10 @@ func @assoc1: (<2 x 3 x f32>, <2 x 3 x f32>, <2 x 3 x f32>, <2 x 3 x f32>) -> <2
 }
 
 // CHECK-LABEL: func @assoc1
-// CHECK:     %0.0 = multiply %x: <2 x 3 x f32>, %a: <2 x 3 x f32>
-// CHECK-NEXT:     %0.1 = multiply %y: <2 x 3 x f32>, %z: <2 x 3 x f32>
-// CHECK-NEXT:     %0.2 = divide %0.0: <2 x 3 x f32>, %0.1: <2 x 3 x f32>
-// CHECK-NEXT:     return %0.2: <2 x 3 x f32>
+// CHECK: %0.0 = multiply %x: <2 x 3 x f32>, %a: <2 x 3 x f32>
+// CHECK-NEXT: %0.1 = multiply %y: <2 x 3 x f32>, %z: <2 x 3 x f32>
+// CHECK-NEXT: %0.2 = divide %0.0: <2 x 3 x f32>, %0.1: <2 x 3 x f32>
+// CHECK-NEXT: return %0.2: <2 x 3 x f32>
 
 func @assoc2: (<2 x 3 x f32>, <2 x 3 x f32>, <2 x f32>) -> <2 x 3 x f32> {
 'entry(%x: <2 x 3 x f32>, %y: <2 x 3 x f32>, %z: <2 x f32>):
@@ -64,7 +64,7 @@ func @assoc2: (<2 x 3 x f32>, <2 x 3 x f32>, <2 x f32>) -> <2 x 3 x f32> {
 }
 
 // CHECK-LABEL: func @assoc2
-// CHECK:     %z_ = shapeCast %z: <2 x f32> to 2 x 1
-// CHECK-NEXT:     %0.1 = multiply %x: <2 x 3 x f32>, %z_: <2 x 1 x f32>
-// CHECK-NEXT:     %0.2 = divide %0.1: <2 x 3 x f32>, %y: <2 x 3 x f32>
-// CHECK-NEXT:     return %0.2: <2 x 3 x f32>
+// CHECK: %z_ = shapeCast %z: <2 x f32> to 2 x 1
+// CHECK-NEXT: %0.1 = multiply %x: <2 x 3 x f32>, %z_: <2 x 1 x f32>
+// CHECK-NEXT: %0.2 = divide %0.1: <2 x 3 x f32>, %y: <2 x 3 x f32>
+// CHECK-NEXT: return %0.2: <2 x 3 x f32>
