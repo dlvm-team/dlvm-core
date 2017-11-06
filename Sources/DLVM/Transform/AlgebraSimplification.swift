@@ -19,15 +19,15 @@
 
 /// Algebra Simplification simplifies the following expressions
 /// 1. Arithmetics
-/// 1.1 Neutral/absorbing expressions
+/// *  Neutral/absorbing expressions
 ///    - x + 0 | 0 + x | x - 0 | x * 1 | 1 * x | x / 1 => x
 ///    - x * 0 | 0 * x => 0
 ///    - x^0 => 1
 ///    - x^1 => x
-/// 1.2 Same argument reduction
+/// * Same argument reduction
 ///    - x - x => 0
 ///    - x / x => 1
-/// 1.3 Strength reduction
+/// * Strength reduction
 ///    - x^(-1) => 1 / x
 ///    - x^2 => x * x
 /// 2. Trignometry
