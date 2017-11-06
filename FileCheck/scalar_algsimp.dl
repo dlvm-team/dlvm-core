@@ -36,7 +36,7 @@ func @bar: (f32, f32, f32) -> f32 {
 
 // CHECK-LABEL: func @bar
 // CHECK: %0.0 = cos 1: f32
-// CHECK-LABEL: 'bb0
+// CHECK-LABEL: 'bb0():
 // CHECK-NEXT: %lit = literal <1: f32, 1: f32>: <2 x f32>
 // CHECK-NEXT: %1.1 = extract 0 from 1: <2 x f32>
 // CHECK-NEXT: return %1.1: f32
