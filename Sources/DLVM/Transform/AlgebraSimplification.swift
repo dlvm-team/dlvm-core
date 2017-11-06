@@ -239,26 +239,31 @@ open class AlgebraSimplification : TransformPass {
     }
 
     // MARK: - Pass entry
-
+    
     open class func run(on body: Function) -> Bool {
         var changed = false
         var workList: [AlgebraicExpression] = []
         let builder = IRBuilder(function: body)
         /// First iteration
-        for bb in body {
-            let algExprs = bb.analysis(from: AlgebraicExpressionAnalysis.self)
-            for expr in algExprs.expressions {
-                workList.append(expr)
+        var changedInIter: Bool
+        repeat {
+            changedInIter = false
+            for bb in body {
+                let algExprs = bb.analysis(from: AlgebraicExpressionAnalysis.self)
+                for expr in algExprs.expressions {
+                    workList.append(expr)
+                }
             }
-        }
-        /// Iterate through the worklist and optimize them
-        while let expr = workList.popLast() {
-            for expr in expr.transposeTraversed(in: .breadthFirst) where !expr.isAtom {
-                let newlyChanged = performSimplification(on: expr, in: body, using: builder, workList: &workList)
-                changed = changed || newlyChanged
-                if newlyChanged { break }
+            /// Iterate through the worklist and optimize them
+            while let expr = workList.popLast() {
+                for expr in expr.transposeTraversed(in: .breadthFirst) where !expr.isAtom {
+                    let newlyChanged = performSimplification(on: expr, in: body, using: builder, workList: &workList)
+                    changedInIter = changedInIter || newlyChanged
+                    if newlyChanged { break }
+                }
             }
-        }
+            changed = changed || changedInIter
+        } while changedInIter
         return changed
     }
 }
