@@ -26,9 +26,9 @@ class TransformTests: XCTestCase {
         builder.buildInstruction(.numericBinary(.add, %dead1, 20000 ~ Type.int(32)),
                                  name: "dead2")
         let cmp = builder.compare(.equal, %mult, .literal(.int(32), 1))
-        let thenBB = builder.buildBasicBlock(named: "then", arguments: [ "x" : .int(32) ], in: fun)
-        let elseBB = builder.buildBasicBlock(named: "else", arguments: [ "x" : .int(32) ], in: fun)
-        let contBB = builder.buildBasicBlock(named: "cont", arguments: [ "x" : .int(32) ], in: fun)
+        let thenBB = builder.buildBasicBlock(named: "then", arguments: ["a" : .int(32)], in: fun)
+        let elseBB = builder.buildBasicBlock(named: "else", arguments: ["b" : .int(32)], in: fun)
+        let contBB = builder.buildBasicBlock(named: "cont", arguments: ["c" : .int(32)], in: fun)
         builder.conditional(%cmp, then: thenBB, arguments: [.literal(.int(32), 0)],
                             else: elseBB, arguments: [.literal(.int(32), 1)])
         builder.move(to: thenBB)
@@ -62,18 +62,18 @@ class TransformTests: XCTestCase {
                 %0.0 = multiply 5: i32, 8: i32
                 %0.1 = equal %0.0: i32, 1: i32
                 conditional %0.1: bool then 'then(0: i32) else 'else(1: i32)
-            'then(%x: i32):
-                branch 'cont(%x: i32)
-            'else(%x: i32):
-                branch 'cont(%x: i32)
-            'cont(%x: i32):
-                return %x: i32
+            'then(%a: i32):
+                branch 'cont(%a: i32)
+            'else(%b: i32):
+                branch 'cont(%b: i32)
+            'cont(%c: i32):
+                return %c: i32
             }
             """
         XCTAssertEqual(fun.description, after)
 
         /// Reapplying shouldn't mutate the function
-        XCTAssertFalse(module.mapTransform(AlgebraSimplification.self))
+        XCTAssertFalse(module.mapTransform(DeadCodeElimination.self))
     }
 
     func testCSE() throws {
@@ -89,9 +89,9 @@ class TransformTests: XCTestCase {
         let common5 = builder.add(.literal(.int(32), 3), %common3)
         let common6 = builder.add(.literal(.int(32), 3), %common4)
         let cmp = builder.compare(.equal, %common5, %common6)
-        let thenBB = builder.buildBasicBlock(named: "then", arguments: [ "x" : .int(32) ], in: fun)
-        let elseBB = builder.buildBasicBlock(named: "else", arguments: [ "x" : .int(32) ], in: fun)
-        let contBB = builder.buildBasicBlock(named: "cont", arguments: [ "x" : .int(32) ], in: fun)
+        let thenBB = builder.buildBasicBlock(named: "then", arguments: ["a" : .int(32)], in: fun)
+        let elseBB = builder.buildBasicBlock(named: "else", arguments: ["b" : .int(32)], in: fun)
+        let contBB = builder.buildBasicBlock(named: "cont", arguments: ["c" : .int(32)], in: fun)
         builder.conditional(%cmp, then: thenBB, arguments: [.literal(.int(32), 0)],
                             else: elseBB, arguments: [.literal(.int(32), 1)])
         builder.move(to: thenBB)
@@ -116,15 +116,15 @@ class TransformTests: XCTestCase {
         ///     %0.5 = add 3: i32, %0.3: i32
         ///     %0.6 = equal %0.4: i32, %0.5: i32
         ///     conditional %0.6: bool then 'then(0: i32) else 'else(1: i32)
-        ///     'then(%x: i32):
+        ///     'then(%a: i32):
         ///     %1.0 = add 3: i32, 7: i32
         ///     branch 'cont(%1.0: i32)
-        ///     'else(%x: i32):
+        ///     'else(%b: i32):
         ///     %2.0 = add 3: i32, 7: i32
         ///     branch 'cont(%2.0: i32)
-        ///     'cont(%x: i32):
+        ///     'cont(%c: i32):
         ///     %3.0 = add 3: i32, %0.2: i32
-        ///     %3.1 = add %3.0: i32, %x: i32
+        ///     %3.1 = add %3.0: i32, %c: i32
         ///     return %3.1: i32
         /// }
 
@@ -138,14 +138,14 @@ class TransformTests: XCTestCase {
                 %0.2 = add 3: i32, %0.1: i32
                 %0.3 = equal %0.2: i32, %0.2: i32
                 conditional %0.3: bool then 'then(0: i32) else 'else(1: i32)
-            'then(%x: i32):
+            'then(%a: i32):
                 %1.0 = add 3: i32, 7: i32
                 branch 'cont(%1.0: i32)
-            'else(%x: i32):
+            'else(%b: i32):
                 %2.0 = add 3: i32, 7: i32
                 branch 'cont(%2.0: i32)
-            'cont(%x: i32):
-                %3.0 = add %0.2: i32, %x: i32
+            'cont(%c: i32):
+                %3.0 = add %0.2: i32, %c: i32
                 return %3.0: i32
             }
             """
@@ -194,7 +194,6 @@ class TransformTests: XCTestCase {
 
         let module = builder.module
         module.mapTransform(AlgebraSimplification.self)
-
         let after = """
             func @foo: (i32) -> i32 {
             'entry(%x: i32):
