@@ -76,6 +76,86 @@ class TransformTests: XCTestCase {
         XCTAssertFalse(module.mapTransform(AlgebraSimplification.self))
     }
 
+    func testCSE() throws {
+        let fun = builder.buildFunction(named: "bar",
+                                        argumentTypes: [.scalar(.int(32))],
+                                        returnType: .int(32))
+        let entry = builder.buildEntry(argumentNames: ["x"], in: fun)
+        builder.move(to: entry)
+        let common1 = builder.add(%entry.arguments[0], .literal(.int(32), 1))
+        let common2 = builder.add(%entry.arguments[0], .literal(.int(32), 1))
+        let common3 = builder.multiply(%common1, .literal(.int(32), 2))
+        let common4 = builder.multiply(%common2, .literal(.int(32), 2))
+        let common5 = builder.add(.literal(.int(32), 3), %common3)
+        let common6 = builder.add(.literal(.int(32), 3), %common4)
+        let cmp = builder.compare(.equal, %common5, %common6)
+        let thenBB = builder.buildBasicBlock(named: "then", arguments: [ "x" : .int(32) ], in: fun)
+        let elseBB = builder.buildBasicBlock(named: "else", arguments: [ "x" : .int(32) ], in: fun)
+        let contBB = builder.buildBasicBlock(named: "cont", arguments: [ "x" : .int(32) ], in: fun)
+        builder.conditional(%cmp, then: thenBB, arguments: [.literal(.int(32), 0)],
+                            else: elseBB, arguments: [.literal(.int(32), 1)])
+        builder.move(to: thenBB)
+        let notCommon1 = builder.add(.literal(.int(32), 3), .literal(.int(32), 7))
+        builder.branch(contBB, [%notCommon1])
+        builder.move(to: elseBB)
+        let notCommon2 = builder.add(.literal(.int(32), 3), .literal(.int(32), 7))
+        builder.branch(contBB, [%notCommon2])
+        builder.move(to: contBB)
+        let common7 = builder.add(.literal(.int(32), 3), %common3)
+        let add = builder.add(%common7, %contBB.arguments[0])
+        builder.return(%add)
+
+        /// Original:
+        /// func @bar: (i32) -> i32 {
+        ///     'entry(%x: i32):
+        ///     %0.0 = add %x: i32, 1: i32
+        ///     %0.1 = add %x: i32, 1: i32
+        ///     %0.2 = multiply %0.0: i32, 2: i32
+        ///     %0.3 = multiply %0.1: i32, 2: i32
+        ///     %0.4 = add 3: i32, %0.2: i32
+        ///     %0.5 = add 3: i32, %0.3: i32
+        ///     %0.6 = equal %0.4: i32, %0.5: i32
+        ///     conditional %0.6: bool then 'then(0: i32) else 'else(1: i32)
+        ///     'then(%x: i32):
+        ///     %1.0 = add 3: i32, 7: i32
+        ///     branch 'cont(%1.0: i32)
+        ///     'else(%x: i32):
+        ///     %2.0 = add 3: i32, 7: i32
+        ///     branch 'cont(%2.0: i32)
+        ///     'cont(%x: i32):
+        ///     %3.0 = add 3: i32, %0.2: i32
+        ///     %3.1 = add %3.0: i32, %x: i32
+        ///     return %3.1: i32
+        /// }
+
+        let module = builder.module
+        module.mapTransform(CommonSubexpressionElimination.self)
+        let after = """
+            func @bar: (i32) -> i32 {
+            'entry(%x: i32):
+                %0.0 = add %x: i32, 1: i32
+                %0.1 = multiply %0.0: i32, 2: i32
+                %0.2 = add 3: i32, %0.1: i32
+                %0.3 = equal %0.2: i32, %0.2: i32
+                conditional %0.3: bool then 'then(0: i32) else 'else(1: i32)
+            'then(%x: i32):
+                %1.0 = add 3: i32, 7: i32
+                branch 'cont(%1.0: i32)
+            'else(%x: i32):
+                %2.0 = add 3: i32, 7: i32
+                branch 'cont(%2.0: i32)
+            'cont(%x: i32):
+                %3.0 = add %0.2: i32, %x: i32
+                return %3.0: i32
+            }
+            """
+        XCTAssertEqual(fun.description, after)
+
+        /// Reapplying shouldn't mutate the function
+        XCTAssertFalse(module.mapTransform(CommonSubexpressionElimination.self))
+    }
+
+
     func testAlgebraSimplification() {
         let fun = builder.buildFunction(named: "foo",
                                         argumentTypes: [.scalar(.int(32))],
@@ -130,6 +210,7 @@ class TransformTests: XCTestCase {
     static var allTests : [(String, (TransformTests) -> () throws -> Void)] {
         return [
             ("testDCE", testDCE),
+            ("testCSE", testCSE),
             ("testAlgebraSimplification", testAlgebraSimplification),
         ]
     }
