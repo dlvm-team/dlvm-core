@@ -493,7 +493,7 @@ public extension Literal {
 
 // MARK: - Equality
 
-public extension InstructionKind {
+extension InstructionKind : Equatable {
     public static func == (lhs: InstructionKind, rhs: InstructionKind) -> Bool {
         switch (lhs, rhs) {
         case let (.literal(x1, t1), .literal(x2, t2)):
@@ -798,4 +798,3 @@ public extension InstructionKind {
         }
     }
 }
-
