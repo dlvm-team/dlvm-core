@@ -18,10 +18,50 @@
 //
 
 /// Eliminates common subexpressions in a function
+/// WIP: Currently only eliminates trivially redundant instructions
 open class CommonSubexpressionElimination : TransformPass {
     public typealias Body = Function
 
     open class func run(on body: Function) -> Bool {
-        DLUnimplemented()
+        var changed: Bool = false
+        var availableValues: Set<Instruction> = []
+        var count = 0
+        /// Iterate over the original function
+        for inst in body.instructions {
+            changed = performCSE(on: inst, availableValues: &availableValues, count: &count) || changed
+        }
+        return changed
+    }
+
+    private static func isEqual(_ lhs: Instruction, _ rhs: Instruction) -> Bool {
+        return lhs.type == rhs.type
+            && lhs.opcode == rhs.opcode
+            && lhs.operands == rhs.operands
+    }
+
+    private static func performCSE(on inst: Instruction,
+                                   availableValues: inout Set<Instruction>,
+                                   count: inout Int) -> Bool {
+        let function = inst.parent.parent
+        let module = function.parent
+        let dfg = function.analysis(from: DominanceAnalysis.self)
+        let sideEffectInfo = module.analysis(from: SideEffectAnalysis.self)
+
+        /// If instruction has side effects or is a terminator, change nothing
+        guard sideEffectInfo[inst] == .none,
+            !inst.kind.isTerminator else { return false }
+
+        /// If instruction does not match a dominating available value, add it to
+        /// available values
+        guard let available = availableValues.first(where: { isEqual($0, inst) }),
+            dfg.properlyDominates(available, inst) else {
+                availableValues.insert(inst)
+                return false
+        }
+        /// Otherwise, replace instruction with corresponding available value
+        inst.removeFromParent()
+        function.replaceAllUses(of: inst, with: %available)
+        count += 1
+        return true
     }
 }
