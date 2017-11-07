@@ -19,7 +19,7 @@
 
 import CoreTensor
 
-public enum ReductionCombinator {
+public enum ReductionCombinator : Equatable {
     case function(Use)
     case numeric(NumericBinaryOp)
     case boolean(BooleanBinaryOp)

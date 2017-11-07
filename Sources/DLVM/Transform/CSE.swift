@@ -34,9 +34,7 @@ open class CommonSubexpressionElimination : TransformPass {
     }
 
     private static func isEqual(_ lhs: Instruction, _ rhs: Instruction) -> Bool {
-        return lhs.type == rhs.type
-            && lhs.opcode == rhs.opcode
-            && lhs.operands == rhs.operands
+        return lhs.kind == rhs.kind
     }
 
     private static func performCSE(on inst: Instruction,
@@ -44,7 +42,7 @@ open class CommonSubexpressionElimination : TransformPass {
                                    count: inout Int) -> Bool {
         let function = inst.parent.parent
         let module = function.parent
-        let dfg = function.analysis(from: DominanceAnalysis.self)
+        let domTree = function.analysis(from: DominanceAnalysis.self)
         let sideEffectInfo = module.analysis(from: SideEffectAnalysis.self)
 
         /// If instruction has side effects or is a terminator, change nothing
@@ -54,7 +52,7 @@ open class CommonSubexpressionElimination : TransformPass {
         /// If instruction does not match a dominating available value, add it to
         /// available values
         guard let available = availableValues.first(where: { isEqual($0, inst) }),
-            dfg.properlyDominates(available, inst) else {
+            domTree.properlyDominates(available, inst) else {
                 availableValues.insert(inst)
                 return false
         }

@@ -234,6 +234,7 @@ public extension InstructionKind {
 }
 
 // MARK: - Type inference
+
 public extension InstructionKind {
     /// Infers and returns the type of the result of the instruction
     var type: Type {
@@ -404,7 +405,7 @@ public extension InstructionKind {
             return t.elementType(at: ii).flatMap(Type.pointer) ?? .invalid
 
         case let .bitCast(_, t):
-//            guard v.type.size == t.size else { return .invalid }
+            // guard v.type.size == t.size else { return .invalid }
             return t
 
         case let .allocateBox(t):
@@ -486,6 +487,87 @@ public extension Literal {
             return tups.map{$1}.flatMap(literalOperands(in:))
         default:
             return []
+        }
+    }
+}
+
+// MARK: - Equality
+
+public extension InstructionKind {
+    public static func == (lhs: InstructionKind, rhs: InstructionKind) -> Bool {
+        switch (lhs, rhs) {
+        case let (.literal(x1, t1), .literal(x2, t2)):
+            return x1 == x2 && t1 == t2
+        case let (.numericUnary(op1, x1), .numericUnary(op2, y1)):
+            return op1 == op2 && x1 == y1
+        case let (.numericBinary(op1, x1, x2), .numericBinary(op2, y1, y2)):
+            return op1 == op2 && x1 == y1 && x2 == y2
+        case let (.booleanBinary(op1, x1, x2), .booleanBinary(op2, y1, y2)):
+            return op1 == op2 && x1 == y1 && x2 == y2
+        case let (.compare(op1, x1, x2), .compare(op2, y1, y2)):
+            return op1 == op2 && x1 == y1 && x2 == y2
+        case let (.not(x1), .not(x2)):
+            return x1 == x2
+        case let (.dot(x1, x2), .dot(y1, y2)):
+            return x1 == y1 && x2 == y2
+        case let (.reduce(op1, x1, i1, d1), .reduce(op2, y1, i2, d2)):
+            return op1 == op2 && x1 == y1 && i1 == i2 && d1 == d2
+        case let (.scan(op1, x1, i1), .scan(op2, x2, i2)):
+            return op1 == op2 && x1 == x2 && i1 == i2
+        case let (.concatenate(vv1, axis1), .concatenate(vv2, axis2)):
+            return vv1 == vv2 && axis1 == axis2
+        case let (.transpose(x1), .transpose(x2)):
+            return x1 == x2
+        case let (.slice(x1, at: range1), .slice(x2, at: range2)):
+            return x1 == x2 && range1 == range2
+        case let (.random(s1, from: l1, upTo: h1), .random(s2, from: l2, upTo: h2)):
+            return s1 == s2 && l1 == l2 && h1 == h2
+        case let (.select(l1, r1, by: f1), .select(l2, r2, by: f2)):
+            return l1 == l2 && r1 == r2 && f1 == f2
+        case let (.dataTypeCast(x1, dt1), .dataTypeCast(x2, dt2)):
+            return x1 == x2 && dt1 == dt2
+        case let (.shapeCast(x1, s1), .shapeCast(x2, s2)):
+            return x1 == x2 && s1 == s2
+        case let (.apply(f1, args1), .apply(f2, args2)):
+            return f1 == f2 && args1 == args2
+        case let (.extract(from: v1, at: i1), .extract(from: v2, at: i2)):
+            return v1 == v2 && i1 == i2
+        case let (.insert(s1, to: d1, at: i1), .insert(s2, to: d2, at: i2)):
+            return s1 == s2 && d1 == d2 && i1 == i2
+        case let (.allocateStack(t1, n1), .allocateStack(t2, n2)):
+            return t1 == t2 && n1 == n2
+        case let (.load(x1), .load(x2)):
+            return x1 == x2
+        case let (.elementPointer(x1, ii1), .elementPointer(x2, ii2)):
+            return x1 == x2 && ii1 == ii2
+        case let (.bitCast(x1, t1), .bitCast(x2, t2)):
+            return x1 == x2 && t1 == t2
+        case let (.allocateBox(t1), .allocateBox(t2)):
+            return t1 == t2
+        case let (.allocateHeap(t1, count: c1), .allocateHeap(t2, count: c2)):
+            return t1 == t2 && c1 == c2
+        case let (.projectBox(x1), .projectBox(x2)):
+            return x1 == x2
+        case let (.store(x1, to: d1), .store(x2, to: d2)):
+            return x1 == x2 && d1 == d2
+        case let (.copy(from: f1, to: t1, count: c1), .copy(from: f2, to: t2, count: c2)):
+            return f1 == f2 && t1 == t2 && c1 == c2
+        case let (.deallocate(x1), .deallocate(x2)):
+            return x1 == x2
+        case let (.branch(bb1, x1), .branch(bb2, x2)):
+            return bb1 == bb2 && x1 == x2
+        case let (.conditional(c1, t1, ta1, e1, ea1), .conditional(c2, t2, ta2, e2, ea2)):
+            return c1 == c2 && t1 == t2 && ta1 == ta2 && e1 == e2 && ea1 == ea2
+        case let (.return(x1), .return(x2)):
+            return x1 == x2
+        case let (.retain(x1), .retain(x2)):
+            return x1 == x2
+        case let (.release(x1), .release(x2)):
+            return x1 == x2
+        case (.trap, .trap):
+            return true
+        default:
+            return false
         }
     }
 }
