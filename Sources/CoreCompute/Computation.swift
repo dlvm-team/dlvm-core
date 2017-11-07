@@ -34,3 +34,9 @@ public extension Computation {
         self.init(name: name, arguments: arguments.map(Variable.init))
     }
 }
+
+extension Computation : Equatable {
+    public static func == (lhs: Computation, rhs: Computation) -> Bool {
+        return lhs === rhs
+    }
+}

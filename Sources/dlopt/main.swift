@@ -95,6 +95,7 @@ func main() throws {
 
         /// Print IR instead of writing to file if requested
         if Options.shouldPrintIR.wasSet {
+            print()
             print(module)
         }
 

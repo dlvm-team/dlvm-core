@@ -61,4 +61,16 @@ public extension IRCollection {
         }
         return changed
     }
+    
+    @discardableResult
+    func mapTransform<Transform : TransformPass>(
+        _ transform: Transform.Type, bypassingVerification noVerify: Bool = false) -> Bool
+        where Element : IRCollection, Transform.Body == Element.Element
+    {
+        var changed = false
+        for element in self {
+            changed = element.mapTransform(transform, bypassingVerification: noVerify) || changed
+        }
+        return changed
+    }
 }

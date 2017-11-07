@@ -1,0 +1,34 @@
+// RUN: dlopt -f %s -p DCE --print-ir | FileCheck %s
+
+// CHECK: DCE: changed
+
+module "mnist"
+stage raw
+
+func @inference: (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32> {
+'entry(%x: <1 x 784 x f32>, %w: <784 x 10 x f32>, %b: <1 x 10 x f32>):
+    %0.0 = dot %x: <1 x 784 x f32>, %w: <784 x 10 x f32>
+    %0.1 = add %0.0: <1 x 10 x f32>, %b: <1 x 10 x f32>
+    return %0.1: <1 x 10 x f32>
+}
+
+func @bar: (f32, f32) -> i32 {
+'entry(%x: f32, %y: f32):
+    %0.0 = multiply 5: i32, 8: i32
+    %dead1 = multiply 10000: i32, 20000: i32
+    %dead2 = add %dead1: i32, 20000: i32
+    %dead3 = apply @inference(1: <1 x 784 x f32>, 2: <784 x 10 x f32>, 3: <1 x 10 x f32>): (<1 x 784 x f32>, <784 x 10 x f32>, <1 x 10 x f32>) -> <1 x 10 x f32>
+    %0.4 = equal %0.0: i32, 1: i32
+    conditional %0.4: bool then 'then(0: i32) else 'else(1: i32)
+'then(%a: i32):
+    branch 'cont(%a: i32)
+'else(%b: i32):
+    branch 'cont(%b: i32)
+'cont(%c: i32):
+    return %c: i32
+}
+
+// CHECK-LABEL: func @bar
+// CHECK: %0.0 = multiply 5: i32, 8: i32
+// CHECK-NEXT: %0.1 = equal %0.0: i32, 1: i32
+// CHECK-NEXT: conditional %0.1: bool then 'then(0: i32) else 'else(1: i32)

@@ -93,19 +93,19 @@ class TransformTests: XCTestCase {
         let a3 = builder.multiply(%a2, .literal(.int(32), 1))
         let a4 = builder.multiply(.literal(.int(32), 1), %a3)
         let a5 = builder.divide(%a4, .literal(.int(32), 1))
-        /// - x * 0 | 0 * x => 0
+        /// x * 0 | 0 * x => 0
         let b0 = builder.multiply(x, .literal(.int(32), 0))
         let b1 = builder.multiply(%b0, x)
         let b2 = builder.add(%b1, %a5)
-        /// - x^0 => 1
-        /// - x^1 => x
+        /// x^0 => 1
+        /// x^1 => x
         let c0 = builder.power(%b2, .literal(.int(32), 0))
         let c1 = builder.power(%b2, %c0)
 
         /// Same argument reduction
-        /// - x - x => 0
+        /// x - x => 0
         let d0 = builder.subtract(x, x)
-        /// - x / x => 1
+        /// x / x => 1
         let d1 = builder.divide(x, x)
         let d2 = builder.multiply(%d0, %d1)
         let d3 = builder.add(%c1, %d2)
