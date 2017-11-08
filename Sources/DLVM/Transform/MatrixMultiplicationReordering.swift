@@ -38,7 +38,7 @@ open class MatrixMultiplicationReordering : TransformPass {
         var temp: [[Int]] = Array(repeating: Array(repeating: 0, count: dims.count), count: dims.count)
         var cost = temp
         for l in 1 ..< chain.count {
-            for i in 1 ..< chain.count {
+            for i in 1 ..< dims.count - l {
                 let j = i + l
                 cost[i][j] = Int.max
                 for k in i..<j {
@@ -86,9 +86,13 @@ open class MatrixMultiplicationReordering : TransformPass {
                     guard case let (.tensor(s1, _), .tensor(s2, _)) = (lhs.type.canonical, rhs.type.canonical) else {
                         preconditionFailure("Ill-formed instruction \(inst)")
                     }
-                    /// Append to chain
-                    chain.append((operand: lhs, shape: s1))
-                    chain.append((operand: rhs, shape: s2))
+                    /// Append to chain if operands are non-dot
+                    if lhs.instruction?.opcode != .dot {
+                        chain.append((operand: lhs, shape: s1))
+                    }
+                    if rhs.instruction?.opcode != .dot {
+                        chain.append((operand: rhs, shape: s2))
+                    }
                     insts.append(next)
                 }
                 chains.append((chain: chain, instructions: insts))
@@ -110,8 +114,12 @@ open class MatrixMultiplicationReordering : TransformPass {
                     return %builder.dot(insert(lhs), insert(rhs))
                 }
             }
-            let newTopInst = insert(expr)
-            body.replaceAllUses(of: topInst, with: newTopInst)
+            let newTop = insert(expr)
+            guard case let .instruction(_, newTopInst) = newTop else {
+                preconditionFailure("\(newTop) must be an instruction. Something's wrong.")
+            }
+            newTopInst.name = topInst.name
+            body.replaceAllUses(of: topInst, with: newTop)
             for oldInst in insts {
                 oldInst.removeFromParent()
             }

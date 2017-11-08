@@ -1,0 +1,47 @@
+// RUN: dlopt -f %s -p MMR --print-ir | FileCheck %s
+
+// CHECK: MMR: changed
+
+module "mnist"
+stage raw
+
+// Dimensions
+//                      M6
+//                  M5
+//               M4
+//           M3
+//       M2
+//   M1
+// 30, 35, 15, 5, 10, 20, 25
+
+// Optimal ordering
+// ((M1 (M2 M3)) ((M4 M5) M6))
+
+func @f: (<30 x 35 x f32>, <35 x 15 x f32>) -> <30 x 25 x f32> {
+'entry(%M1: <30 x 35 x f32>, %M2: <35 x 15 x f32>):
+    %M3 = literal 1: <15 x 5 x f32>
+    branch 'bb0()
+'bb0():
+    %M4 = literal 1: <5 x 10 x f32>
+    branch 'bb1()
+'bb1():
+    %M5 = literal 1: <10 x 20 x f32>
+    %M6 = literal 1: <20 x 25 x f32>
+    branch 'bb2()
+'bb2():
+    %3.0 = dot %M1: <30 x 35 x f32>, %M2: <35 x 15 x f32>
+    %a = dot %3.0: <30 x 15 x f32>, %M3: <15 x 5 x f32>
+    %b = dot %a: <30 x 5 x f32>, %M4: <5 x 10 x f32>
+    %c = dot %b: <30 x 10 x f32>, %M5: <10 x 20 x f32>
+    %d = dot %c: <30 x 20 x f32>, %M6: <20 x 25 x f32>
+    return %d: <30 x 25 x f32>
+}
+
+// CHECK-LABEL: 'bb2():
+// CHECK: %3.0 = dot %M2: <35 x 15 x f32>, %M3: <15 x 5 x f32>
+// CHECK-NEXT: %3.1 = dot %M1: <30 x 35 x f32>, %3.0: <35 x 5 x f32>
+// CHECK-NEXT: %3.2 = dot %M4: <5 x 10 x f32>, %M5: <10 x 20 x f32>
+// CHECK-NEXT: %3.3 = dot %3.2: <5 x 20 x f32>, %M6: <20 x 25 x f32>
+// CHECK-NEXT: %d = dot %3.1: <30 x 5 x f32>, %3.3: <5 x 25 x f32>
+// CHECK-NEXT: return %d: <30 x 25 x f32>
+
