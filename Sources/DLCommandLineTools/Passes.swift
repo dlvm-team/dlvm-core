@@ -39,7 +39,7 @@ public func runPass(named name: String, on module: Module,
         changed = module.mapTransform(StackPromotion.self, bypassingVerification: noVerify)
     case "VP", "ValuePromotion":
         changed = module.mapTransform(ValuePromotion.self, bypassingVerification: noVerify)
-    case "MMR", "MatrixChainOrdering":
+    case "MMR", "MatrixMultiplicationOrdering":
         changed = module.mapTransform(MatrixMultiplicationReordering.self, bypassingVerification: noVerify)
     case "LBP", "LiteralBroadcastingPromotion":
         changed = module.mapTransform(LiteralBroadcastingPromotion.self, bypassingVerification: noVerify)
