@@ -33,10 +33,6 @@ open class CommonSubexpressionElimination : TransformPass {
         return changed
     }
 
-    private static func isEqual(_ lhs: Instruction, _ rhs: Instruction) -> Bool {
-        return lhs.kind == rhs.kind
-    }
-
     private static func performCSE(on inst: Instruction,
                                    availableValues: inout Set<Instruction>,
                                    count: inout Int) -> Bool {
@@ -51,7 +47,7 @@ open class CommonSubexpressionElimination : TransformPass {
 
         /// If instruction does not match a dominating available value, add it to
         /// available values
-        guard let available = availableValues.first(where: { isEqual($0, inst) }),
+        guard let available = availableValues.first(where: { $0.kind == inst.kind }),
             domTree.properlyDominates(available, inst) else {
                 availableValues.insert(inst)
                 return false
