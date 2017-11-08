@@ -37,8 +37,8 @@ open class MatrixMultiplicationReordering : TransformPass {
         /// Compute cost matrix
         var temp: [[Int]] = Array(repeating: Array(repeating: 0, count: dims.count), count: dims.count)
         var cost = temp
-        for l in 1 ..< dims.count - 1 {
-            for i in 1 ..< dims.count - l {
+        for l in 1 ..< chain.count {
+            for i in 1 ..< chain.count {
                 let j = i + l
                 cost[i][j] = Int.max
                 for k in i..<j {
@@ -58,8 +58,8 @@ open class MatrixMultiplicationReordering : TransformPass {
                 : .dot(makeExpression(i, temp[i][j]), makeExpression(temp[i][j] + 1, j))
         }
         /// Return cost and expression
-        let expr = makeExpression(1, dims.count - 1)
-        return (cost[1][dims.count - 1], expr)
+        let expr = makeExpression(1, chain.count)
+        return (cost[1][chain.count], expr)
     }
     
     open class func run(on body: Function) -> Bool {
