@@ -1,6 +1,6 @@
 //
 //  mmul.swift
-//  DLVM Comptue Primitives
+//  DLVM Compute Primitives
 //
 //  Copyright 2016-2017 Richard Wei.
 //

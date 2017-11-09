@@ -224,7 +224,7 @@ public extension InstructionKind {
         }
     }
 
-    /// Returns true iff the instruction represets a linear transformation
+    /// Returns true iff the instruction represents a linear transformation
     var isLinearTransformation: Bool {
         switch self {
         case .transpose, .dot: return true

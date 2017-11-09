@@ -252,7 +252,7 @@ public extension Type {
         case let .tuple(tt): return .tuple(tt.map{$0.canonical})
         case let .pointer(t): return .pointer(t.canonical)
         case let .box(t): return .box(t.canonical)
-        case let .function(tt, t): return.function(tt.map{$0.canonical}, t.canonical)
+        case let .function(tt, t): return .function(tt.map{$0.canonical}, t.canonical)
         case let .alias(alias): return alias.type?.canonical ?? self
         case .tensor, .invalid, .struct: return self
         }
