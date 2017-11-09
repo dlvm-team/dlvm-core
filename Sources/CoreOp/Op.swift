@@ -19,7 +19,7 @@
 
 import CoreTensor
 
-public typealias TensorType = (TensorShape, DataType)
+public typealias TensorType = (shape: TensorShape, dt: DataType)
 
 public protocol TensorOp {
     associatedtype Configuration
@@ -56,7 +56,7 @@ public enum ComparisonOp {
 extension ComparisonOp : TensorOp {
     public typealias Configuration = (TensorType, TensorType)
     public static func resultType(for config: Configuration) -> TensorType? {
-        let ((s1, dt1), (s2, dt2)) = config
+        let ((shape: s1, dt: dt1), (shape: s2, dt: dt2)) = config
         guard let bcShape = s1.broadcast(with: s2), dt1 == dt2, dt1.isNumeric else {
             return nil
         }
@@ -72,7 +72,7 @@ public enum BooleanOp {
 extension BooleanOp : TensorOp {
     public typealias Configuration = (TensorType, TensorType)
     public static func resultType(for config: Configuration) -> TensorType? {
-        let ((s1, dt1), (s2, dt2)) = config
+        let ((shape: s1, dt: dt1), (shape: s2, dt: dt2)) = config
         guard let bcShape = s1.broadcast(with: s2), dt1 == dt2, dt1.isBool else {
             return nil
         }
@@ -90,7 +90,7 @@ public enum NumericBinaryOp {
 extension NumericBinaryOp : TensorOp {
     public typealias Configuration = (TensorType, TensorType)
     public static func resultType(for config: Configuration) -> TensorType? {
-        let ((s1, dt1), (s2, dt2)) = config
+        let ((shape: s1, dt: dt1), (shape: s2, dt: dt2)) = config
         guard let bcShape = s1.broadcast(with: s2), dt1 == dt2, dt1.isNumeric else {
             return nil
         }
@@ -107,7 +107,7 @@ public enum BooleanBinaryOp {
 extension BooleanBinaryOp : TensorOp {
     public typealias Configuration = (TensorType, TensorType)
     public static func resultType(for config: Configuration) -> TensorType? {
-        let ((s1, dt1), (s2, dt2)) = config
+        let ((shape: s1, dt: dt1), (shape: s2, dt: dt2)) = config
         guard let bcShape = s1.broadcast(with: s2), dt1 == dt2, dt1.isBool else {
             return nil
         }
@@ -155,7 +155,7 @@ public enum TransposeOp : TensorOp {
 public enum ShapeCastOp : TensorOp {
     public typealias Configuration = (TensorType, TensorShape)
     public static func resultType(for config: Configuration) -> TensorType? {
-        let ((s, dt), newShape) = config
+        let ((shape: s, dt: dt), newShape) = config
         guard s.contiguousSize == newShape.contiguousSize else { return nil }
         return (newShape, dt)
     }
@@ -165,7 +165,7 @@ public enum ShapeCastOp : TensorOp {
 public enum SliceOp : TensorOp {
     public typealias Configuration = (TensorType, at: CountableClosedRange<Int>)
     public static func resultType(for config: Configuration) -> TensorType? {
-        var ((s, dt), range) = config
+        var ((shape: s, dt: dt), range) = config
         guard let firstDim = s.first, range.contains(firstDim)
             else { return nil }
         s[0] = range.count
@@ -177,7 +177,7 @@ public enum SliceOp : TensorOp {
 public enum RandomOp : TensorOp {
     public typealias Configuration = (TensorShape, from: TensorType, upTo: TensorType)
     public static func resultType(for config: Configuration) -> TensorType? {
-        guard case let (shape, (.scalar, dt1), (.scalar, dt2)) = config,
+        guard case let (shape, (shape: .scalar, dt: dt1), (shape: .scalar, dt: dt2)) = config,
             dt1 == dt2, dt1.isNumeric
             else { return nil }
         return (shape, dt1)
@@ -188,7 +188,7 @@ public enum RandomOp : TensorOp {
 public enum SelectOp : TensorOp {
     public typealias Configuration = (TensorType, TensorType, by: TensorType)
     public static func resultType(for config: Configuration) -> TensorType? {
-        guard case let ((s1, dt1), (s2, dt2), (s3, .bool)) = config,
+        guard case let ((shape: s1, dt: dt1), (shape: s2, dt: dt2), (shape: s3, dt: .bool)) = config,
             dt1 == dt2, let shape = broadcast(s1, s2, s3)
             else { return nil }
         return (shape, dt1)
