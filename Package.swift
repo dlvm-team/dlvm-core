@@ -39,7 +39,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/rxwei/LLVM_C", from: "2.1.0"),
         .package(url: "https://github.com/rxwei/CommandLine", from: "4.0.0"),
-        .package(url: "https://github.com/dlvm-team/CoreTensor", from: "0.6.1")
+        .package(url: "https://github.com/dlvm-team/CoreTensor", from: "0.6.2")
     ],
     targets: [
         .target(name: "CoreOp", dependencies: ["CoreTensor"]),
