@@ -296,3 +296,54 @@ public extension Use {
         return value.makeScalar(scalar)
     }
 }
+
+// MARK: - Tensor to literal conversions
+// WIP: rewrite using numeric protocols, may become deprecated
+
+public extension TensorProtocol where UnitType == Int {
+    func toLiteral() -> Literal {
+        if shape.isScalar {
+            return .scalar(.int(self.unit(at: 0)))
+        } else {
+            let type: Type = .tensor(shape, .int(UInt(Int.bitWidth)))
+            let elementTensors: [Use] = map { .literal(type, $0.toLiteral()) }
+            return .tensor(elementTensors)
+        }
+    }
+}
+
+public extension TensorProtocol where UnitType == Float {
+    func toLiteral() -> Literal {
+        if shape.isScalar {
+            return .scalar(.float(Double(self.unit(at: 0))))
+        } else {
+            let type: Type = .tensor(shape, .float(.single))
+            let elementTensors: [Use] = map { .literal(type, $0.toLiteral()) }
+            return .tensor(elementTensors)
+        }
+    }
+}
+
+public extension TensorProtocol where UnitType == Double {
+    func toLiteral() -> Literal {
+        if shape.isScalar {
+            return .scalar(.float(Double(self.unit(at: 0))))
+        } else {
+            let type: Type = .tensor(shape, .float(.double))
+            let elementTensors: [Use] = map { .literal(type, $0.toLiteral()) }
+            return .tensor(elementTensors)
+        }
+    }
+}
+
+public extension TensorProtocol where UnitType == BooleanLiteralType {
+    func toLiteral() -> Literal {
+        if shape.isScalar {
+            return .scalar(.bool(self.unit(at: 0)))
+        } else {
+            let type: Type = .tensor(shape, .bool)
+            let elementTensors: [Use] = map { .literal(type, $0.toLiteral()) }
+            return .tensor(elementTensors)
+        }
+    }
+}
