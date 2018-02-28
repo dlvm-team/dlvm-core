@@ -112,10 +112,8 @@ extension DoubleLinkedList {
       nextNode?.previous = previousNode
     }
     count -= 1
-    assert(
-      (end != nil && start != nil && count >= 1) || (end == nil && start == nil && count == 0),
-      "⚠️ Internal invariant not upheld at the end of remove"
-    )
+    assert((end != nil && start != nil && count >= 1) || (end == nil && start == nil && count == 0),
+           "Invalid remove operation")
   }
 
   public func remove(atIndex index: Int) {
