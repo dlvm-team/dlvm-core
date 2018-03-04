@@ -56,9 +56,9 @@ class ADTTests : XCTestCase {
 
     func testDoubleLinkedList() {
         var list = DoubleLinkedList<String>()
-        XCTAssertTrue(list.isEmpty())
-        list.append(value: "test")
-        XCTAssertEqual(list.valueAt(0), "test")
+        XCTAssertTrue(list.isEmpty)
+        list.append("test")
+        XCTAssertEqual(list.value(at: 0), "test")
     }
 
     func testPerformanceExample() {

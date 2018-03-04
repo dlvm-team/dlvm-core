@@ -1,7 +1,4 @@
-import Foundation
-
-
-public class ListNode<T: Equatable> {
+fileprivate class ListNode<T: Equatable> {
   public let value: T
   var next: ListNode<T>? = nil
   var previous: ListNode<T>? = nil
@@ -17,7 +14,7 @@ extension ListNode: CustomStringConvertible {
   }
 }
 
-public final class DoubleLinkedList<T: Equatable> {  
+fileprivate final class DoubleLinkedList<T: Equatable> {  
 
   var start: ListNode<T>? {
     didSet {
@@ -49,7 +46,7 @@ public final class DoubleLinkedList<T: Equatable> {
 
   public init<S: Sequence>(_ elements: S) where S.Iterator.Element == T {
     for element in elements {
-      append(value: element)
+      append(element)
     }
   }
 }
@@ -73,7 +70,7 @@ extension DoubleLinkedList {
     return nil
   }
   
-  public func nodeAt(index: Int) -> ListNode<T> {
+  public func node(at index: Int) -> ListNode<T> {
     precondition(index >= 0 && index < count, "This index: \(index) is out of bounds. Accepted range is between 0 and \(count)")
     
     let result = iterate {
@@ -85,12 +82,11 @@ extension DoubleLinkedList {
     return result!
   }
 
-  public func valueAt(index: Int) -> T {
-    let node = nodeAt(index: index)
-    return node.value
+  public func value(at index: Int) -> T {
+    return node(at: index).value
   }
   
-  public func append(value: T) {
+  public func append(_ value: T) {
     let lastEnd = end
     end = ListNode<T>(value: value)
     end?.previous = lastEnd
@@ -98,16 +94,16 @@ extension DoubleLinkedList {
     count += 1
   }
 
-  public func remove(node: ListNode<T>) {
+  public func remove(_ node: ListNode<T>) {
     let nextNode = node.next
     let previousNode = node.previous
     
     if node === start && node === end {
       start = nil
       end = nil
-    }else if node === start {
+    } else if node === start {
       start = node.next
-    }else {
+    } else {
       previousNode?.next = nextNode
       nextNode?.previous = previousNode
     }
@@ -116,7 +112,7 @@ extension DoubleLinkedList {
            "Invalid remove operation")
   }
 
-  public func remove(atIndex index: Int) {
+  public func remove(at index: Int) {
     precondition(index >= 0 && index < count ,  "This index: \(index) is out of bounds. Accepted range is between 0 and \(count)")
     let result = iterate {
       if $1 == index {
@@ -124,25 +120,58 @@ extension DoubleLinkedList {
       }
       return nil
     }
-    remove(node: result!)
+    remove(result!)
   }
 }
 
-// COW tings
+// Make DoubleLinkedList conform to Sequence protocol
+extension DoubleLinkedList: Sequence {
+
+  public typealias Iterator = DoubleLinkedListGenerator<T>
+
+  ///Return a *generator* over the elements of this *sequence*.
+  public func makeIterator() -> Iterator {
+    return DoubleLinkedListGenerator(linkedList: self)
+  }
+}
+
+
+// create a Generator that conforms 
+// TODO: this is skipping first element??
+fileprivate struct DoubleLinkedListGenerator<T: Equatable>: IteratorProtocol {
+
+  fileprivate let linkedList: DoubleLinkedList<T>
+  fileprivate var current: ListNode<T>?
+
+  fileprivate init(linkedList: DoubleLinkedList<T>) {
+    self.linkedList = linkedList
+    self.current = linkedList.start
+  }
+
+  ///Advance to the next element and return it, or `nil` if no next element exists.
+  public mutating func next() -> ListNode<T>? {
+    let node = self.current?.next
+    self.current = node
+    return node
+  }
+}
+
+
+// COW extension
 extension DoubleLinkedList {
   func copy() -> DoubleLinkedList<T> {
     let newList = DoubleLinkedList<T>()
     for element in self {
-      newList.append(value: element.value)
+      newList.append(element.value)
     }
     return newList
   }
 }
 
-public struct DoubleLinkedListCOW<T: Equatable> {
+public struct IRList<T: Equatable> {
   
-  var storage: DoubleLinkedList<T>
-  var mutableStorage: DoubleLinkedList<T> {
+  fileprivate var storage: DoubleLinkedList<T>
+  fileprivate var mutableStorage: DoubleLinkedList<T> {
     mutating get {
       if !isKnownUniquelyReferenced(&storage) {
         storage = storage.copy()
@@ -158,6 +187,9 @@ public struct DoubleLinkedListCOW<T: Equatable> {
   public init<S: Sequence> (_ elements: S) where S.Iterator.Element == T {
     storage = DoubleLinkedList(elements)
   }
+}
+
+extension IRList {
   public var count: Int {
     get {
       return storage.count
@@ -168,21 +200,35 @@ public struct DoubleLinkedListCOW<T: Equatable> {
       return storage.isEmpty
     }
   }
-  public mutating func append(value: T) {
-    mutableStorage.append(value: value)
+  public mutating func append(_ value: T) {
+    mutableStorage.append(value)
   }
-  public func nodeAt(index: Int) -> ListNode<T> {
-    return storage.nodeAt(index: index)
+  private func node(at index: Int) -> ListNode<T> {
+    return storage.node(at: index)
   }
-  public func valueAt(index: Int) -> T {
-    let node = nodeAt(index: index)
-    return node.value
+  public func value(at index: Int) -> T {
+    return node(at: index).value
   }
-  public mutating func remove(node: ListNode<T>) {
-    mutableStorage.remove(node: node)
+  fileprivate mutating func removeNode(_ node: ListNode<T>) {
+    mutableStorage.remove(node)
   }
-  public mutating func remove(atIndex index: Int) {
-    mutableStorage.remove(atIndex: index)
+  public mutating func remove(at index: Int) {
+    mutableStorage.remove(at: index)
   }
 }
+
+// private var list = DoubleLinkedList<String>()
+// print(list.isEmpty)
+// list.append("this")
+// print(list.value(at: 0))
+// list.append("is")
+// list.append("List")
+// list.append("more")
+// list.append("stuff")
+// list.append("aaa")
+
+// for node in list {
+//   print("\(node)")
+// }
+
 
