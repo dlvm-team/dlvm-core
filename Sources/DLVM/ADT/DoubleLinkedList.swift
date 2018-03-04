@@ -9,7 +9,7 @@ fileprivate class ListNode<T: Equatable> {
 extension ListNode: CustomStringConvertible {
   public var description: String {
     get {
-      return "Value of list node: (\(value))"
+      return "Node(\(value))"
     }
   }
 }
@@ -33,12 +33,6 @@ fileprivate final class DoubleLinkedList<T: Equatable> {
   }
   
   public var count: Int = 0
-  
-  public var isEmpty: Bool {
-    get {
-      return count == 0
-    }
-  }
   
   public init() {
     
@@ -68,6 +62,10 @@ extension DoubleLinkedList {
       node = node?.next
     }
     return nil
+  }
+
+  public var isEmpty: Bool {
+    return count == 0
   }
   
   public func node(at index: Int) -> ListNode<T> {
@@ -226,6 +224,8 @@ extension IRList {
 // list.append("more")
 // list.append("stuff")
 // list.append("aaa")
+// print(list.isEmpty)
+// print(list.value(at: 3))
 
 // for node in list {
 //   print("\(node)")
