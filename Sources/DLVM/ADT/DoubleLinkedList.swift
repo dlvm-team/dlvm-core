@@ -80,7 +80,7 @@ extension DoubleLinkedList {
     return result!
   }
 
-  public func value(at index: Int) -> T {
+  public subscript(_ index: Int) -> T {
     return node(at: index).value
   }
   
@@ -120,6 +120,38 @@ extension DoubleLinkedList {
     }
     remove(result!)
   }
+
+  public func insert(_ element: T, at index: Int) {
+    precondition(index >= 0 && index < count ,  "This index: \(index) is out of bounds. Accepted range is between 0 and \(count)")
+    // find the desired node
+    let result = iterate {
+      if $1 == index {
+        return $0
+      }
+      return nil
+    }
+    let newNode = ListNode<T>(value: element)
+    let previousNode = result?.previous
+    let nextNode = result?.next
+    previousNode?.next = newNode
+    nextNode?.previous = newNode
+    newNode.next = nextNode
+    newNode.previous = previousNode
+  }
+
+    // mutating func insert(_ element: Element, after other: Element) {
+    //     guard let previousIndex = index(of: other) else {
+    //         preconditionFailure("Element to insert after is not in the set")
+    //     }
+    //     insert(element, at: previousIndex + 1)
+    // }
+
+    // mutating func insert(_ element: Element, before other: Element) {
+    //     guard let index = index(of: other) else {
+    //         preconditionFailure("Element to insert before is not in the set")
+    //     }
+    //     insert(element, at: index)
+    // }
 }
 
 // Make DoubleLinkedList conform to Sequence protocol
@@ -230,5 +262,4 @@ extension IRList {
 // for node in list {
 //   print("\(node)")
 // }
-
 
