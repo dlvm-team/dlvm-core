@@ -80,6 +80,10 @@ extension DoubleLinkedList {
     return result!
   }
 
+  public func value(at index: Int) -> T {
+    return node(at: index).value
+  }
+
   public subscript(_ index: Int) -> T {
     return node(at: index).value
   }
@@ -90,6 +94,19 @@ extension DoubleLinkedList {
     end?.previous = lastEnd
     lastEnd?.next = end
     count += 1
+  }
+
+  func index(of element: T) -> Int? {
+    var node = start
+    var index = 0
+    while node != nil {
+      if node?.value == element {
+        return index
+      }
+      index += 1
+      node = node?.next
+    }
+    return nil
   }
 
   public func remove(_ node: ListNode<T>) {
@@ -132,26 +149,26 @@ extension DoubleLinkedList {
     }
     let newNode = ListNode<T>(value: element)
     let previousNode = result?.previous
-    let nextNode = result?.next
     previousNode?.next = newNode
-    nextNode?.previous = newNode
-    newNode.next = nextNode
+    result?.previous = newNode
+    newNode.next = result
     newNode.previous = previousNode
   }
 
-    // mutating func insert(_ element: Element, after other: Element) {
-    //     guard let previousIndex = index(of: other) else {
-    //         preconditionFailure("Element to insert after is not in the set")
-    //     }
-    //     insert(element, at: previousIndex + 1)
-    // }
+  func insert(_ element: T, before other: T) {
+    guard let index = index(of: other) else {
+            preconditionFailure("Element to insert before is not in the set")
+    }
+    insert(element, at: index)
+  }
 
-    // mutating func insert(_ element: Element, before other: Element) {
-    //     guard let index = index(of: other) else {
-    //         preconditionFailure("Element to insert before is not in the set")
-    //     }
-    //     insert(element, at: index)
-    // }
+  func insert(_ element: T, after other: T) {
+    guard let previousIndex = index(of: other) else {
+        preconditionFailure("Element to insert after is not in the set")
+    }
+    insert(element, at: previousIndex + 1)
+  }
+
 }
 
 // Make DoubleLinkedList conform to Sequence protocol
@@ -166,7 +183,7 @@ extension DoubleLinkedList: Sequence {
 }
 
 
-// create a Generator that conforms 
+// create a Generator that conforms to IteratorProtocol
 // TODO: this is skipping first element??
 fileprivate struct DoubleLinkedListGenerator<T: Equatable>: IteratorProtocol {
 
@@ -247,19 +264,19 @@ extension IRList {
   }
 }
 
-// private var list = DoubleLinkedList<String>()
-// print(list.isEmpty)
-// list.append("this")
-// print(list.value(at: 0))
-// list.append("is")
-// list.append("List")
-// list.append("more")
-// list.append("stuff")
-// list.append("aaa")
-// print(list.isEmpty)
-// print(list.value(at: 3))
+private var list = DoubleLinkedList<String>()
+list.append("this")
+list.append("is")
+list.append("List")
+list.append("more")
+list.append("stuff")
+list.append("after stuff")
+list.append("aaa")
+list.append("aaa")
+list.append("aaa")
+list.insert("should be inserted after stuff", after: "stuff")
 
-// for node in list {
-//   print("\(node)")
-// }
+for node in list {
+  print("\(node)")
+}
 
