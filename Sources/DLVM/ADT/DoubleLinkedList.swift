@@ -46,7 +46,6 @@ fileprivate final class DoubleLinkedList<T: Equatable> {
 }
 
 
-// TODO: need to add append after and append before, if this is to replace OrderedSet
 extension DoubleLinkedList {
   
   private func iterate(block: (_ node: ListNode<T>, _ index: Int) throws -> ListNode<T>?) rethrows -> ListNode<T>? {
@@ -184,11 +183,11 @@ extension DoubleLinkedList: Sequence {
 
 
 // create a Generator that conforms to IteratorProtocol
-// TODO: this is skipping first element??
 fileprivate struct DoubleLinkedListGenerator<T: Equatable>: IteratorProtocol {
 
   fileprivate let linkedList: DoubleLinkedList<T>
   fileprivate var current: ListNode<T>?
+  fileprivate var first: Bool = true
 
   fileprivate init(linkedList: DoubleLinkedList<T>) {
     self.linkedList = linkedList
@@ -197,9 +196,15 @@ fileprivate struct DoubleLinkedListGenerator<T: Equatable>: IteratorProtocol {
 
   ///Advance to the next element and return it, or `nil` if no next element exists.
   public mutating func next() -> ListNode<T>? {
-    let node = self.current?.next
-    self.current = node
-    return node
+    if first {
+      first = false
+      return self.current
+    }
+    else{
+      let node = self.current?.next
+      self.current = node
+      return node
+    }
   }
 }
 
