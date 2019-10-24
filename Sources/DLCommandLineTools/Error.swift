@@ -19,7 +19,7 @@
 
 import Foundation
 import Basic
-import Utility
+import SPMUtility
 
 public enum DLError: Error {
     /// No input files were specified.

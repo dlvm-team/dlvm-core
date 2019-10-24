@@ -366,7 +366,7 @@ public extension EnumType {
 }
 
 public extension Type {
-    public var isValid: Bool {
+    var isValid: Bool {
         switch self {
         case .invalid:
             return false
@@ -391,13 +391,13 @@ public extension Type {
 }
 
 public extension TypeAlias {
-    public var isValid: Bool {
+    var isValid: Bool {
         return type?.isValid ?? true
     }
 }
 
 public extension Type {
-    public func makeZero() -> LiteralValue {
+    func makeZero() -> LiteralValue {
         return LiteralValue(type: self, literal: .zero)
     }
 }

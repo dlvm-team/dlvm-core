@@ -40,8 +40,8 @@ extension InstructionKind {
                 fatalError("\(y) is not a tensor")
             }
             let reductionAxes = s1.indices
-                .filter { $0 >= s2.count || s1[s1.count - $0 - 1] < s2[s2.count - $0 - 1] }
-                .map { s1.count - $0 - 1 }
+                .filter { (index: Int) in index >= s2.count || s1[s1.count - index - 1] < s2[s2.count - index - 1] }
+                .map { (index: Int) in s1.count - index - 1 }
             /// If no need to sum, return original x
             if reductionAxes.isEmpty { return x }
             let sum = bd.reduce(.numeric(.add), x,
@@ -313,7 +313,7 @@ extension InstructionKind {
              .createStack, .destroyStack, .push, .pop,
              .insert, .allocateStack, .allocateHeap, .allocateBox, .projectBox,
              .retain, .release, .deallocate, .load, .store, .elementPointer, .copy,
-             .trap:
+             .trap, .builtin(_, _):
             return nil
         }
         return adjoints

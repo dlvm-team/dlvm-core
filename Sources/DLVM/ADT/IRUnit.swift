@@ -21,14 +21,14 @@ public protocol EquatableByReference : AnyObject, Equatable {}
 public protocol HashableByReference : EquatableByReference, Hashable {}
 
 public extension EquatableByReference {
-    public static func == (lhs: Self, rhs: Self) -> Bool {
+    static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs === rhs
     }
 }
 
 public extension HashableByReference {
-    public var hashValue: Int {
-        return ObjectIdentifier(self).hashValue
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(ObjectIdentifier(self))
     }
 }
 

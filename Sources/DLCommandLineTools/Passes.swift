@@ -18,8 +18,8 @@
 //
 
 import DLVM
-import protocol Utility.StringEnumArgument
-import enum Utility.ShellCompletion
+import protocol SPMUtility.StringEnumArgument
+import enum SPMUtility.ShellCompletion
 
 public enum TransformPass: String {
     case algebraSimplification = "AlgebraSimplification"
