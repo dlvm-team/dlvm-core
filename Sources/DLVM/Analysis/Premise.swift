@@ -28,7 +28,7 @@ public extension PremiseHolder
     where PremiseVerifier.Result == Premise, PremiseVerifier.Body == Self
 {
     func verifyPremise() throws -> Premise {
-        return try runVerification(PremiseVerifier.self)
+        return try self.runVerification(PremiseVerifier.self)
     }
 
     var premise: Premise {

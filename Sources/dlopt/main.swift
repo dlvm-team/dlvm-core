@@ -22,7 +22,7 @@ import DLParse
 import DLCommandLineTools
 import Foundation
 import Basic
-import Utility
+import SPMUtility
 
 class OptToolOptions : ToolOptions {
     /// Bypass verification
@@ -51,7 +51,7 @@ class DLOptTool : CommandLineTool<OptToolOptions> {
         // NOTE: To be removed when PathArgument init checks for invalid paths.
         // Error should indicate raw string argument, not the corresponding
         // path.
-        if let invalidFile = options.inputFiles.first(where: { !isFile($0) }) {
+        if let invalidFile = options.inputFiles.first(where: { !localFileSystem.isFile($0) }) {
             throw DLError.invalidInputFile(invalidFile)
         }
 
@@ -59,7 +59,7 @@ class DLOptTool : CommandLineTool<OptToolOptions> {
             /// Read IR and verify
             print("Source file:", inputFile.prettyPath())
             /// Parse
-            let module = try Module.parsed(fromFile: inputFile.asString)
+            let module = try Module.parsed(fromFile: inputFile.pathString)
 
             /// Run passes
             try runPass(.differentiation, on: module,
@@ -80,7 +80,7 @@ class DLOptTool : CommandLineTool<OptToolOptions> {
             /// Otherwise, write result to IR file by default
             else {
                 let path = outputPaths?[i] ?? inputFile
-                try module.write(toFile: path.asString)
+                try module.write(toFile: path.pathString)
             }
         }
     }

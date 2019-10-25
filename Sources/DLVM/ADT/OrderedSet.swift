@@ -124,7 +124,7 @@ extension OrderedSet : Sequence {
 }
 
 extension OrderedSet
-    : RangeReplaceableCollection, BidirectionalCollection, MutableCollection {
+    : RangeReplaceableCollection, RandomAccessCollection, MutableCollection {
     public typealias Index = Int
     public typealias Indices = CountableRange<Int>
     public typealias SubSequence = OrderedSetSlice<Element>
@@ -235,7 +235,7 @@ extension OrderedSetSlice : Sequence {
 }
 
 extension OrderedSetSlice
-    : RangeReplaceableCollection, BidirectionalCollection, MutableCollection {
+    : RangeReplaceableCollection, RandomAccessCollection, MutableCollection {
     public typealias Index = Int
     public typealias Indices = CountableRange<Int>
     public typealias SubSequence = OrderedSetSlice

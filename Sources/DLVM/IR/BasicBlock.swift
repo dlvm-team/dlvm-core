@@ -147,7 +147,7 @@ public extension BasicBlock {
 // MARK: - Naming
 
 public extension Argument {
-    public var printedName: String {
+    var printedName: String {
         if let name = name {
             return name
         }
@@ -157,7 +157,7 @@ public extension Argument {
 }
 
 public extension BasicBlock {
-    public var printedName: String {
+    var printedName: String {
         return name ?? indexInParent.description
     }
 }

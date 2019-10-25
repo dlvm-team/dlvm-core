@@ -24,7 +24,7 @@
 #endif
 
 import Basic
-import Utility
+import SPMUtility
 import struct DLVM.OrderedSet
 
 open class CommandLineTool<Options : ToolOptions> {
@@ -97,7 +97,7 @@ open class CommandLineTool<Options : ToolOptions> {
             let result = try parser.parse(arguments)
             // Fill and set options.
             var options = Options()
-            binder.fill(result, into: &options)
+            try! binder.fill(parseResult: result, into: &options)
             // Validate options.
             if let passes = options.passes, passes.contains(.differentiation) {
                 printDiagnostic(RedundantDifferentiationFlagDiagnostic())
