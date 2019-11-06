@@ -19,6 +19,7 @@
 
 import XCTest
 @testable import struct DLVM.OrderedSet
+@testable import struct DLVM.DoubleLinkedList
 
 class ADTTests : XCTestCase {
     func testOrderedSet() {
@@ -51,6 +52,13 @@ class ADTTests : XCTestCase {
         var set2: OrderedSet<Int> = [1, 2, 3, 4, 5]
         set2.swapAt(1, 3)
         XCTAssertEqual(set2, [1, 4, 3, 2, 5])
+    }
+
+    func testDoubleLinkedList() {
+        var list = DoubleLinkedList<String>()
+        XCTAssertTrue(list.isEmpty)
+        list.append("test")
+        XCTAssertEqual(list.value(at: 0), "test")
     }
 
     func testPerformanceExample() {
