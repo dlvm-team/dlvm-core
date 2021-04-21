@@ -33,4 +33,4 @@ E: zheng321@purdue.edu
 W: http://danzheng.me
 D: Contributor to almost everything, including the infrastructure, IR,
    transforms, command line tools and DSLs. Maintaining project website
-   dlvm.org.
+   dlvm-team.github.io.
