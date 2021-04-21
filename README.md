@@ -2,7 +2,7 @@
 ## Core Compiler Infrastructure
 
 Welcome to DLVM! For general information about the DLVM project,
-please visit [dlvm.org](http://dlvm.org).
+please visit [dlvm-team.github.io](https://dlvm-team.github.io).
 
 This repository does not include a code generator.
 
